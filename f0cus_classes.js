@@ -2,18 +2,21 @@
 
 // CLASS ObjectWithXYWH (any drawable object)
 class ObjectWithXYWH {
-    constructor(cluster) {
-      this.cluster = cluster;
-      this.x = 0;
-      this.y = 0;
-      this.width = 0;
-      this.height = 0;
+    constructor(name) {
+      this.name = name;
     }
+    draw(x,y,w,h) {
+        paper.rect(x,y,w,h);
+    }
+}
 
 //CLASS ProcessStep
 class ProcessStep extends ObjectWithXYWH {
     constructor(name) {
         this.name = name;
+    }
+    draw() {
+        paper.rect(x,y,w,h);
     }
 }
 //CLASS ProcessLink
