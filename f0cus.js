@@ -2,13 +2,16 @@
 
 
 $(function($){//adding click functionality to the buttons
- $("#idefsteps").click(function(){
+ $("#idefsteps").click(function() {
             ProcessAmount();
     })
 
- $("#addarrows").click(function(){
+ $("#addarrows").click(function() {
             AddArr();
     })
+ $("#testbox").click(function() {
+        alert('test');
+ })
 })
     
 

@@ -2,10 +2,12 @@
 
 //CLASS ProcessStep
 class ProcessStep {
-    constructor(name,x,y) {
+    constructor(name,x,y,w,h) {
         this.name = name;
         this.x = x;
         this.y = y;
+        this.w = w;
+        this.h = h; 
     }
 }
 //CLASS ProcessLink
