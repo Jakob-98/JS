@@ -1,23 +1,26 @@
 // F0CUS CLASS DEFINITIONS
 
+// CLASS ObjectWithXYWH (any drawable object)
+class ObjectWithXYWH {
+    constructor(cluster) {
+      this.cluster = cluster;
+      this.x = 0;
+      this.y = 0;
+      this.width = 0;
+      this.height = 0;
+    }
+
 //CLASS ProcessStep
-class ProcessStep {
-    constructor(name,x,y,w,h) {
+class ProcessStep extends ObjectWithXYWH {
+    constructor(name) {
         this.name = name;
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h; 
     }
 }
 //CLASS ProcessLink
-class ProcessLink {
-    constructor(name,x,y) {
+class ProcessLink extends ObjectWithXYWH {
+    constructor(name) {
         this.name = name;
-        this.x = x;
-        this.y = y; 
     }
-
 }
 
 
