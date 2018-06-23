@@ -1,20 +1,3 @@
-//main JS file project
-
-
-$(function($){//adding click functionality to the buttons
- $("#idefsteps").click(function() {
-            ProcessAmount();
-    })
-
- $("#addarrows").click(function() {
-            AddArr();
-    })
- $("#testbox").click(function() {
-     
- })
-})
-    
-
 //amount of proccesses in the desired IDEF0
 ProcessAmount = function(){
 
@@ -44,11 +27,3 @@ AddArr = function(){ //adding the arrows
         });
     }
 }
-
-
-//Initialization
-window.onload = function() {
-    paper = Raphael("svg_paper", PAPER_HEIGHT , PAPER_WIDTH);
-}
-
-
