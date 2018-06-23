@@ -3,19 +3,25 @@
 
 $(function($){//adding click functionality to the buttons
  $("#idefsteps").click(function() {
-            ProcessAmount();
+            processAmount();
     })
 
  $("#addarrows").click(function() {
-            AddArr(); 
+            addArr(); 
     })
- $("#testbox").click(function() {
-            CreateBox(100,100,50,50);
+ $("#clearbutton").click(function() {
+            paper.clear();
+ })
+ $("#svg_paper").click(function(e) {
+    var offset = $("#svg_paper").offset();
+    mouseDownX = e.pageX - offset.left;
+    mouseDownY = e.pageY - offset.top;
+    createBox(mouseDownX,mouseDownY,60,50)
  })
 })
     
 
-// function CreateBox(x,y,w,h) {
+// function createBox(x,y,w,h) {
 //     var element = paper.rect(x, y, w, h);
 //     element.attr({
 //         fill:'gray',
@@ -25,7 +31,7 @@ $(function($){//adding click functionality to the buttons
 //     return element;
 // }
 
-function CreateBox(x,y,w,h) {
+function createBox(x,y,w,h) {
    a =  new ObjectWithXYWH('test');
    a.draw(x,y,w,h);
 }

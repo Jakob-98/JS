@@ -1,5 +1,5 @@
 //amount of proccesses in the desired IDEF0
-ProcessAmount = function(){
+processAmount = function(){
 
     var Pam = window.prompt("How many processes does your IDEF0 contain?");//asking user input 
     for (var i=0; i < Pam; i+=1){ //create i amount of proccesses
@@ -10,7 +10,7 @@ ProcessAmount = function(){
     }
 }
 
-AddArr = function(){ //adding the arrows
+addArr = function(){ //adding the arrows
     for(var i=0; i < (coords.length - 2); i+=2){//for each process (so each 2nd coord) create the arrow, except for the last one
 
         var PathString =    'M'+(coords[i]+IDF_WIDTH)+' ' //Paths created between the processes.

@@ -2,8 +2,9 @@
 
 // CLASS ObjectWithXYWH (any drawable object)
 class ObjectWithXYWH {
-    constructor(name) {
+    constructor(name,x,y,w,h) {
       this.name = name;
+      this.x = x;
     }
     draw(x,y,w,h) {
         paper.rect(x,y,w,h);
@@ -31,7 +32,5 @@ class ProcessLink extends ObjectWithXYWH {
 class MouseManager {
     constructor(name) {
         this.name = name;
-
-    }
-
+    } 
 }
