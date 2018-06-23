@@ -16,7 +16,7 @@ $(function($){//adding click functionality to the buttons
     var offset = $("#svg_paper").offset();
     mouseDownX = e.pageX - offset.left;
     mouseDownY = e.pageY - offset.top;
-    createBox(mouseDownX,mouseDownY,60,50)
+    createBox(mouseDownX -30,mouseDownY-25,60,50)
  })
 })
     

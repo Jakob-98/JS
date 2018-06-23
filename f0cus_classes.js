@@ -27,7 +27,6 @@ class ProcessLink extends ObjectWithXYWH {
     }
 }
 
-
 // CLASS MOUSEMANAGER
 class MouseManager {
     constructor(name) {
