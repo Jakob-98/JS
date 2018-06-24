@@ -14,9 +14,9 @@ $(function($){//adding click functionality to the buttons
  })
  $("#svg_paper").click(function(e) {
     var offset = $("#svg_paper").offset();
-    mouseDownX = e.pageX - offset.left;
-    mouseDownY = e.pageY - offset.top;
-    createBox(mouseDownX -30,mouseDownY-25,60,50)
+    mouse.test();
+    
+  //  createBox(mouse.posX() -30,mouse.posY()-25,60,50)
  })
 })
     
@@ -41,6 +41,7 @@ function createBox(x,y,w,h) {
 //Initialization
 window.onload = function() {
     paper = Raphael("svg_paper", PAPER_HEIGHT , PAPER_WIDTH);
+    MOUSE = new MouseManager(mouse);
 }
 
 

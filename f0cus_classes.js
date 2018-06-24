@@ -30,6 +30,17 @@ class ProcessLink extends ObjectWithXYWH {
 // CLASS MOUSEMANAGER
 class MouseManager {
     constructor(name) {
-        this.name = name;
+        this.name = name;  
     } 
+
+    offset = $("#svg_paper").offset();//TO DO is dit net om zo offset te definen? 
+    get posX() {
+        return mouseDownX = e.pageX - offset.left;
+    }
+    get posY() {
+        return mouseDownY = e.pageY - offset.top;
+    }
+    test() {
+        alert('hello world!');
+    }
 }
