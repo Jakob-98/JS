@@ -27,3 +27,8 @@ addArr = function(){ //adding the arrows
         });
     }
 }
+
+function crtProcess(x,y,w,h) {
+    tempBox =  new ObjectWithXYWH();
+    tempBox.draw(x,y,w,h);
+ }

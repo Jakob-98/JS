@@ -39,7 +39,7 @@ class MouseManager {
      
      posX(e) {
         var offset = $("#svg_paper").offset();
-        var mouseDownX = e.pageX - offset.top;
+        var mouseDownX = e.pageX - offset.left;
         return mouseDownX
      }
      posY(e) {

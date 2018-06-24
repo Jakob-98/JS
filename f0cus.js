@@ -13,28 +13,10 @@ $(function($){//adding click functionality to the buttons
             paper.clear();
  })
  $("#svg_paper").click(function(e) {
-   createBox(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50)
+    crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50)
  })
 })
     
-
-// function createBox(x,y,w,h) {
-//     var element = paper.rect(x, y, w, h);
-//     element.attr({
-//         fill:'gray',
-//         opacity: .5,
-//         stroke:'#F00'
-//     });
-//     return element;
-// }
-
-
-
-function createBox(x,y,w,h) {
-   a =  new ObjectWithXYWH('test');
-   a.draw(x,y,w,h);
-}
-
 
 
 //Initialization
