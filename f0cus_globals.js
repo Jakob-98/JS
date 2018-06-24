@@ -5,4 +5,5 @@ var
     IDF_WIDTH = 60,
     IDF_Xmult = 150,
     IDF_Ymult = 60,
+    //offset = $("#svg_paper").offset(), //als ik deze offset hier zet, herkent 'ie top niet.
     coords = [];

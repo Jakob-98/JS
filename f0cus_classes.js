@@ -15,7 +15,7 @@ class ObjectWithXYWH {
 class ProcessStep extends ObjectWithXYWH {
     constructor(name) {
         this.name = name;
-    }
+    }   
     draw() {
         paper.rect(x,y,w,h);
     }
@@ -29,18 +29,22 @@ class ProcessLink extends ObjectWithXYWH {
 
 // CLASS MOUSEMANAGER
 class MouseManager {
-    constructor(name) {
-        this.name = name;  
+    constructor(name, lastXDown, lastYDown, lastXUp, lastYUp) {
+        this.name = name,
+        lastXDown = 0; // TO DO add lastXDown tec functionality to mousemanager
+        lastYDown = 0;
+        lastXUp = 0;
+        lastYUp = 0;
     } 
-
-    offset = $("#svg_paper").offset();//TO DO is dit net om zo offset te definen? 
-    get posX() {
-        return mouseDownX = e.pageX - offset.left;
-    }
-    get posY() {
-        return mouseDownY = e.pageY - offset.top;
-    }
-    test() {
-        alert('hello world!');
-    }
+     
+     posX(e) {
+        var offset = $("#svg_paper").offset();
+        var mouseDownX = e.pageX - offset.top;
+        return mouseDownX
+     }
+     posY(e) {
+        var offset = $("#svg_paper").offset();
+        var mouseDownY = e.pageY - offset.top;
+        return mouseDownY
+     }
 }
