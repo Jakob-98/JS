@@ -5,18 +5,18 @@ class ObjectWithXYWH {
     constructor(name,x,y,w,h) {
       this.name = name;
       this.x = x;
-    }
-    draw(x,y,w,h) {
-        paper.rect(x,y,w,h);
+      this.y = y;
+      this.w = w;
+      this.h = h;
     }
 }
 
 //CLASS ProcessStep
 class ProcessStep extends ObjectWithXYWH {
-    constructor(name) {
-        this.name = name;
-    }   
-    draw() {
+    constructor(name,x,y,w,h) {
+        super(name,x,y,w,h);
+    }
+    draw(x,y,w,h) {
         paper.rect(x,y,w,h);
     }
 }

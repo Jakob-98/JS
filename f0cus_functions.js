@@ -29,6 +29,6 @@ addArr = function(){ //adding the arrows
 }
 
 function crtProcess(x,y,w,h) {
-    tempBox =  new ObjectWithXYWH();
+    tempBox =  new ProcessStep();
     tempBox.draw(x,y,w,h);
  }
