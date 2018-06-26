@@ -37,12 +37,12 @@ class MouseManager {
         lastYUp = 0;
     } 
      
-     posX(e) {
-        var offset = $("#svg_paper").offset();
+     posX(e) {//used to call the current Xposition of mouse relative to the canvas during an event
+        var offset = $("#svg_paper").offset();//Q! is this clean code to put offset here?
         var mouseDownX = e.pageX - offset.left;
         return mouseDownX
      }
-     posY(e) {
+     posY(e) {//used to call the current Yposition of mouse relative to the canvas during an event
         var offset = $("#svg_paper").offset();
         var mouseDownY = e.pageY - offset.top;
         return mouseDownY

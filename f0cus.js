@@ -21,8 +21,10 @@ $(function($){//adding click functionality to the buttons
 
 //Initialization
 window.onload = function() {
-    paper = Raphael("svg_paper", PAPER_HEIGHT , PAPER_WIDTH);
+    paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
     MOUSE = new MouseManager();
+       
 }
+
 
 
