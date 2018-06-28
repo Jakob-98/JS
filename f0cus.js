@@ -1,7 +1,7 @@
 //main JS file project
 
 
-$(function($){//adding click functionality to the buttons
+$(function($){//adding click functionality to the buttons, these clickevents should be moved, but not sure where yet.
  $("#idefsteps").click(function() {
             processAmount();
     })
