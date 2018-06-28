@@ -31,7 +31,7 @@ class ProcessLink extends ObjectWithXYWH {
 class MouseManager {
     constructor(name, lastXDown, lastYDown, lastXUp, lastYUp) {
         this.name = name,
-        lastXDown = 0; // TO DO add lastXDown tec functionality to mousemanager
+        lastXDown = 0; // TO DO add lastXDown etc functionality to mousemanager
         lastYDown = 0;
         lastXUp = 0;
         lastYUp = 0;
