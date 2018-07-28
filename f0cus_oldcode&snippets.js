@@ -1,3 +1,7 @@
+// Old code
+// 
+
+
 //amount of proccesses in the desired IDEF0
 processAmount = function(){
 
@@ -36,3 +40,6 @@ addArr = function(){ //adding the arrows
  $("#addarrows").click(function() {
             addArr(); 
     })
+
+//Old code
+//
