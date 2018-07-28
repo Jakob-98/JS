@@ -16,8 +16,17 @@ class ProcessStep extends ObjectWithXYWH {
     constructor(name,x,y,w,h) {
         super(name,x,y,w,h);
     }
-    draw(x,y,w,h) {
-        paper.rect(x,y,w,h);
+    drawRect(x,y,w,h) {
+        let element = paper.rect(x,y,w,h);
+        element.attr({
+            stroke: "#000000"
+        });
+
+        $(element.node).attr('id',ID_COUNTER);
+
+        ID_COUNTER += 1;
+        console.log($(element.node).attr('id'));
+        return element;
     }
 }
 //CLASS ProcessLink
