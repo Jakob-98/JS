@@ -11,13 +11,13 @@ class ObjectWithXYWH {
     }
 }
 
-//CLASS ProcessStep
+//CLASS ProcessStep (aka a rectangle)
 class ProcessStep extends ObjectWithXYWH {
     constructor(name,x,y,w,h) {
         super(name,x,y,w,h);
     }
-    drawRect(x,y,w,h) {
-        var element = paper.rect(x,y,w,h);
+    drawRect(x,y,w,h) { //processstep draws itself, when drawing itself it creates an element, 
+        var element = paper.rect(x,y,w,h);//this element is used for various things. 
         element.attr({
             stroke: "#000000",
             fill: "gray",
@@ -25,15 +25,15 @@ class ProcessStep extends ObjectWithXYWH {
             cursor: "move"
         });
 
-        $(element.node).attr('id',"rect " + ID_COUNTER);
-
+        $(element.node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
         ID_COUNTER += 1;
+
         console.log("rectangle made with id:" + $(element.node).attr('id'));
-        elementHandler(element);
-        return element;
+        elementHandler(element); //handles various events for the element
+        return element; //returns the element Q! should I put the eventhandler and the element in this order?
     }
 }
-//CLASS ProcessLink
+//CLASS ProcessLink (not used at this time)
 class ProcessLink extends ObjectWithXYWH {
     constructor(name) {
         this.name = name;

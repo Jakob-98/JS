@@ -7,7 +7,7 @@ function crtProcess(x,y,w,h) { //creates a process step using a temp
 function unbind() { //unbinds various things
     if (DRAW_RECT == true) {
         DRAW_RECT = false;
-        $("#rectbutton").css("color","black")
+        $("#rectbutton").css("color","black")//button turns black again when clicked
     } 
 }
 
