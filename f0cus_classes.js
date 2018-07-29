@@ -19,13 +19,16 @@ class ProcessStep extends ObjectWithXYWH {
     drawRect(x,y,w,h) {
         let element = paper.rect(x,y,w,h);
         element.attr({
-            stroke: "#000000"
+            stroke: "#000000",
+            fill: "gray",
+            opacity: 0.1
         });
 
         $(element.node).attr('id',ID_COUNTER);
 
         ID_COUNTER += 1;
         console.log($(element.node).attr('id'));
+        elementHandler(element);
         return element;
     }
 }

@@ -17,7 +17,6 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
  $("#svg_paper").click(function(e) {
      if (DRAW_RECT == true) {
         crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50);
-        console.log(DRAW_RECT);
      }
  })
 })

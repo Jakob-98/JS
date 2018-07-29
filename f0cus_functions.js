@@ -9,3 +9,10 @@ function unbind(){
         DRAW_RECT = false;
     } 
 }
+
+function elementHandler(element){
+    element.click(function (e){
+        unbind();
+        console.log($(element.node).attr('id'))
+    })
+}
