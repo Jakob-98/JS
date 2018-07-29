@@ -5,8 +5,20 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
  $("#clearbutton").click(function() {
             paper.clear();
  })
+ $("#unbindbut").click(function() {
+    unbind();
+})
+ $("#rectbutton").click(function() {
+    unbind();
+    if (DRAW_RECT == false) {
+        DRAW_RECT = true;
+    } 
+ })
  $("#svg_paper").click(function(e) {
-    crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50)
+     if (DRAW_RECT == true) {
+        crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50);
+        console.log(DRAW_RECT);
+     }
  })
 })
     

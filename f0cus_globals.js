@@ -1,3 +1,4 @@
+//global variables
 var
     PAPER_HEIGHT = 2000,
     PAPER_WIDTH = Math.round(Math.sqrt(2) * PAPER_HEIGHT),
@@ -6,3 +7,8 @@ var
     IDF_Xmult = 150,
     IDF_Ymult = 60,
     ID_COUNTER = 0;
+
+
+//drawing variables
+var
+    DRAW_RECT = false;
