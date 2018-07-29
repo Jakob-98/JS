@@ -17,17 +17,18 @@ class ProcessStep extends ObjectWithXYWH {
         super(name,x,y,w,h);
     }
     drawRect(x,y,w,h) {
-        let element = paper.rect(x,y,w,h);
+        var element = paper.rect(x,y,w,h);
         element.attr({
             stroke: "#000000",
             fill: "gray",
-            opacity: 0.1
+            opacity: 0.5,
+            cursor: "move"
         });
 
-        $(element.node).attr('id',ID_COUNTER);
+        $(element.node).attr('id',"rect " + ID_COUNTER);
 
         ID_COUNTER += 1;
-        console.log($(element.node).attr('id'));
+        console.log("rectangle made with id:" + $(element.node).attr('id'));
         elementHandler(element);
         return element;
     }

@@ -12,11 +12,12 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
     unbind();
     if (DRAW_RECT == false) {
         DRAW_RECT = true;
+        $("#rectbutton").css("color","blue")
     } 
  })
  $("#svg_paper").click(function(e) {
      if (DRAW_RECT == true) {
-        crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,60,50);
+        crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,RECT_WIDTH,RECT_HEIGHT);
      }
  })
 })
