@@ -32,6 +32,9 @@ class ProcessStep extends ObjectWithXYWH {
         elementHandler(element); //handles various events for the element
         return element; //returns the element Q! should I put the eventhandler and the element in this order?
     }
+    drawName(x,y,name) {
+        var name = paper.text(x,y,name);
+    }
 }
 //CLASS ProcessLink (not used at this time)
 class ProcessLink extends ObjectWithXYWH {

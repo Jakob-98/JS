@@ -2,6 +2,7 @@
 function crtProcess(x,y,w,h) { //creates a process step using a temp
     tempBox =  new ProcessStep();
     tempBox.drawRect(x,y,w,h);
+    tempBox.drawName(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,"test");
  }
 
 function unbind(w) { //unbinds various things, w can be used to determine what to unbind
