@@ -1,8 +1,8 @@
 
 function crtProcess(x,y,w,h) { //creates a process step using a temp
     tempBox =  new ProcessStep();
-    tempBox.drawRect(x,y,w,h);
-    tempBox.drawName(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,"test");
+    tempBox.drawRect('test' + ID_COUNTER,x,y,w,h);
+    //tempBox.drawName(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,"test");
  }
 
 function unbind(w) { //unbinds various things, w can be used to determine what to unbind
@@ -16,11 +16,11 @@ function unbind(w) { //unbinds various things, w can be used to determine what t
     } 
 }
 
-function elementHandler(element) { //handles events of the different elements.
-    element.drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
-    element.click(function (e){
+function elementHandler(elSet) { //handles events of the different elements.
+    elSet.drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
+    elSet.click(function (e){
         unbind('nselect'); //nselect makes sure select doesnt get unbound if it is bound
-        console.log("clicked:" + $(element.node).attr('id'))
+        console.log("clicked:" + $(elSet.node).attr('id'))
     })
 }
 

@@ -16,7 +16,7 @@ class ProcessStep extends ObjectWithXYWH {
     constructor(name,x,y,w,h) {
         super(name,x,y,w,h);
     }
-    drawRect(x,y,w,h) { //processstep draws itself, when drawing itself it creates an element, 
+    drawRect(name,x,y,w,h) { //processstep draws itself, when drawing itself it creates an element, 
         var element = paper.rect(x,y,w,h);//this element is used for various things. 
         element.attr({
             stroke: "#000000",
@@ -24,17 +24,22 @@ class ProcessStep extends ObjectWithXYWH {
             opacity: 0.5,
             cursor: "pointer"
         });
-
+        var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
+        var elSet = new paper.set();
+        elSet.push (nameEl, element);
+        console.log(elSet);
+        //elSet.attr({"id":"set number" = ID_COUNTER});
         $(element.node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
         ID_COUNTER += 1;
 
-        console.log("rectangle made with id:" + $(element.node).attr('id'));
-        elementHandler(element); //handles various events for the element
+        // console.log("rectangle made with id:" + elSet.attr("id"));
+        console.log("set made with id:" + $(element.node).attr('id'));
+        elementHandler(elSet); //handles various events for the element
         return element; //returns the element Q! should I put the eventhandler and the element in this order?
     }
-    drawName(x,y,name) {
-        var name = paper.text(x,y,name);
-    }
+    // drawName(x,y,name) {
+    //     var name = paper.text(x,y,name);
+    // }
 }
 //CLASS ProcessLink (not used at this time)
 class ProcessLink extends ObjectWithXYWH {
