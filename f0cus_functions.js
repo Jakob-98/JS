@@ -25,6 +25,7 @@ function elementHandler(element) { //handles events of the different elements.
 
 function selectElements () {
     unbind();
+    var tempset = new paper.set();
 }
 
 // functions used for dragging objects
