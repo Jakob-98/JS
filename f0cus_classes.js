@@ -22,7 +22,7 @@ class ProcessStep extends ObjectWithXYWH {
             stroke: "#000000",
             fill: "gray",
             opacity: 0.5,
-            cursor: "move"
+            cursor: "pointer"
         });
 
         $(element.node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.

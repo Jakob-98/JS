@@ -10,3 +10,4 @@ var
 //drawing variables
 var
     DRAW_RECT = false;
+    SELECT_ELEM = false;
