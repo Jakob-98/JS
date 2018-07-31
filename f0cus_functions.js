@@ -1,7 +1,8 @@
 
 function crtProcess(x,y,w,h) { //creates a process step using a temp
     tempBox =  new ProcessStep();
-    tempBox.drawRect(x,y,w,h);
+    tempBox.drawRect('test' + ID_COUNTER,x,y,w,h);
+    //tempBox.drawName(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,"test");
  }
 
 function unbind(w) { //unbinds various things, w can be used to determine what to unbind
@@ -15,11 +16,11 @@ function unbind(w) { //unbinds various things, w can be used to determine what t
     } 
 }
 
-function elementHandler(element) { //handles events of the different elements.
-    element.drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
-    element.click(function (e){
+function elementHandler(elSet) { //handles events of the different elements.
+    elSet[1].drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
+    elSet.click(function (e) {
         unbind('nselect'); //nselect makes sure select doesnt get unbound if it is bound
-        console.log("clicked:" + $(element.node).attr('id'))
+        console.log("clicked:" + $(elSet[1].node).attr('id'))
     })
 }
 
@@ -29,13 +30,14 @@ function selectElements () {
 }
 
 // functions used for dragging objects
-//
+// 
 function dragMove (dx, dy) { //dragMove will be called with dx and dy
     nowX = Math.min(PAPER_HEIGHT, this.ox + dx);
     nowY = Math.min(PAPER_WIDTH, this.oy + dy);
     nowX = Math.max(0, nowX);
     nowY = Math.max(0, nowY);            
     this.attr({x: nowX, y: nowY });
+    this.pair.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
 }
 
 function dragStart () { //storing original coordinates
