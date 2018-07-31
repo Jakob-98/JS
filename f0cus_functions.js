@@ -1,8 +1,7 @@
 
 function crtProcess(x,y,w,h) { //creates a process step using a temp
     tempBox =  new ProcessStep();
-    tempBox.drawRect('test' + ID_COUNTER,x,y,w,h);
-    //tempBox.drawName(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,"test");
+    tempBox.processMain('test' + ID_COUNTER,x,y,w,h);
  }
 
 function unbind(w) { //unbinds various things, w can be used to determine what to unbind
@@ -27,6 +26,16 @@ function elementHandler(elSet) { //handles events of the different elements.
 function selectElements () {
     unbind();
     var tempset = new paper.set();
+}
+
+function setCreator (x,y,element,name,elSet) {
+    var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
+    elSet.push (nameEl, element);
+    element.pair = nameEl; //nameEl is paired to element, so if you move element they both move, see dragMove
+    console.log(elSet);
+    $(elSet[1].node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
+    ID_COUNTER += 1;
+    console.log("set made with id:" + $(element.node).attr('id'));
 }
 
 // functions used for dragging objects
