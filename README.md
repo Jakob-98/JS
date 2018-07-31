@@ -16,4 +16,4 @@ http://jsfiddle.net/nCBwC/
 
 TO DO: Export the made model using JSON and localStorage
  
-
+TO DO: replace the 1/2 * rect_width... etc with centre var. 

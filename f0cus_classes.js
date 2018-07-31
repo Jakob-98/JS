@@ -13,7 +13,7 @@ class ObjectWithXYWH {
 
 //CLASS ProcessStep (aka a rectangle)
 class ProcessStep extends ObjectWithXYWH {
-    constructor(name,x,y,w,h) {
+    constructor(name,x,y,w,h) { //Q! this constructor does nothing atm, should the extends just be removed? 
         super(name,x,y,w,h);
     }
     drawRect(name,x,y,w,h) { //processstep draws itself, when drawing itself it creates an element, 
@@ -27,6 +27,7 @@ class ProcessStep extends ObjectWithXYWH {
         var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
         var elSet = new paper.set();
         elSet.push (nameEl, element);
+        element.pair = nameEl; //making a pair fixes the text to move with the block? 
         console.log(elSet);
         //elSet.attr({"id":"set number" = ID_COUNTER});
         $(element.node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
@@ -35,11 +36,7 @@ class ProcessStep extends ObjectWithXYWH {
         // console.log("rectangle made with id:" + elSet.attr("id"));
         console.log("set made with id:" + $(element.node).attr('id'));
         elementHandler(elSet); //handles various events for the element
-        return element; //returns the element Q! should I put the eventhandler and the element in this order?
     }
-    // drawName(x,y,name) {
-    //     var name = paper.text(x,y,name);
-    // }
 }
 //CLASS ProcessLink (not used at this time)
 class ProcessLink extends ObjectWithXYWH {
