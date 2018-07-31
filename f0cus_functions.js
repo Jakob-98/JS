@@ -16,10 +16,10 @@ function unbind(w) { //unbinds various things, w can be used to determine what t
 }
 
 function elementHandler(elSet) { //handles events of the different elements.
-    elSet[1].drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
+    elSet[0].drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
     elSet.click(function (e) {
         unbind('nselect'); //nselect makes sure select doesnt get unbound if it is bound
-        console.log("clicked:" + $(elSet[1].node).attr('id'))
+        console.log("clicked:" + $(elSet[0].node).attr('id'))
     })
 }
 
@@ -28,12 +28,14 @@ function selectElements () {
     var tempset = new paper.set();
 }
 
-function setCreator (x,y,element,name,elSet) {
+function setCreator (x,y,element,name,elSet) { //creates the element set with various extra elements like name
     var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
-    elSet.push (nameEl, element);
-    element.pair = nameEl; //nameEl is paired to element, so if you move element they both move, see dragMove
+    var stepEl = paper.text(x + 7/8 *RECT_WIDTH,y + 7/8 *RECT_HEIGHT,"A" + ID_COUNTER);
+    elSet.push (element, nameEl, stepEl);
+    element.nameEl = nameEl; //nameEl is paired to element, so if you move element they both move, see dragMove
+    element.stepEl = stepEl;
     console.log(elSet);
-    $(elSet[1].node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
+    $(elSet[0].node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
     ID_COUNTER += 1;
     console.log("set made with id:" + $(element.node).attr('id'));
 }
@@ -46,7 +48,8 @@ function dragMove (dx, dy) { //dragMove will be called with dx and dy
     nowX = Math.max(0, nowX);
     nowY = Math.max(0, nowY);            
     this.attr({x: nowX, y: nowY });
-    this.pair.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
+    this.nameEl.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
+    this.stepEl.attr({x: nowX + 7/8 * RECT_WIDTH , y: nowY + 7/8 * RECT_HEIGHT});
 }
 
 function dragStart () { //storing original coordinates
