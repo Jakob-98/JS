@@ -16,7 +16,7 @@ class ProcessStep extends ObjectWithXYWH {
     constructor(name,x,y,w,h) { //Q! this constructor does nothing atm, should the extends just be removed? 
         super(name,x,y,w,h);
     }
-    processMain(name,x,y,w,h) { //processstep draws itself, when drawing itself it creates an element, 
+    static processMain(name, x, y, w, h) { //processstep draws itself, when drawing itself it creates an element,
         var element = paper.rect(x,y,w,h);//this element is used for various things. 
         element.attr({
             stroke: "#000000",
@@ -51,12 +51,10 @@ class MouseManager {
      
      posX(e) {//used to call the current Xposition of mouse relative to the canvas during an event
         var offset = $("#svg_paper").offset();//Q! is this clean code to put offset here?
-        var mouseDownX = e.pageX - offset.left;
-        return mouseDownX
+        return e.pageX - offset.left
      }
      posY(e) {//used to call the current Yposition of mouse relative to the canvas during an event
         var offset = $("#svg_paper").offset();
-        var mouseDownY = e.pageY - offset.top;
-        return mouseDownY
+        return e.pageY - offset.top
      }
 }

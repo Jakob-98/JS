@@ -1,11 +1,11 @@
 
 function crtProcess(x,y,w,h) { //creates a process step using a temp
     tempBox =  new ProcessStep();
-    tempBox.processMain('test' + ID_COUNTER,x,y,w,h);
+    ProcessStep.processMain('test' + ID_COUNTER,x,y,w,h);
  }
 
 function unbind(w) { //unbinds various things, w can be used to determine what to unbind
-    if (DRAW_RECT == true) {
+    if (DRAW_RECT === true) {
         DRAW_RECT = false;
         $("#rectbutton").css("color","black")//button turns black again when clicked
     } 

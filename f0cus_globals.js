@@ -9,5 +9,5 @@ var
 
 //drawing variables
 var
-    DRAW_RECT = false;
+    DRAW_RECT = false,
     SELECT_ELEM = false;
