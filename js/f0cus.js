@@ -31,6 +31,9 @@ $(function($){
     })
 });
 
+/**
+ * Clear the state of all action buttons
+ */
 function resetStateAll() {
     setState('clearbutton', false);
     setState('unbindbutton', false);
@@ -38,6 +41,12 @@ function resetStateAll() {
     setState('rectbutton', false);
 }
 
+/**
+ * Set a button to active or inactive
+ *
+ * @param {string} buttonId
+ * @param {boolean} isActive
+ */
 function setState(buttonId, isActive) {
     var element = $('#' + buttonId);
 
