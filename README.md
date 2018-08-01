@@ -15,3 +15,5 @@ http://jsfiddle.net/nCBwC/
 TO DO: Export the made model using JSON and localStorage
  
 TO DO: replace the 1/2 * rect_width... etc with centre var. 
+
+TO DO: make the 'setcreator' a separate parent class of ProcessStep, or make the processMain a child class of the processstep class to improve code readability/expandability. 
