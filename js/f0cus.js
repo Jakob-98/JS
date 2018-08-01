@@ -2,25 +2,23 @@
  * Adding click functionality to the buttons, these clickevents should be moved, but not sure where yet.
  */
 $(function($){
+    $('.btn').click(function () {
+        resetStateAll();
+    });
     $("#clearbutton").click(function() {
         window.paper.clear();
-        resetStateAll();
     });
-    $("#unbindbutton").click(function() {
-        unbind();
-        resetStateAll();
-    });
+    // TODO: Actually make the unbind button functionallity.
+    // $("#unbindbutton").click(function() {
+    //     resetStateAll();
+    // });
     $("#selectbutton").click(function() {
-        unbind();
-        resetStateAll();
         if (!SELECT_ELEM) {
             SELECT_ELEM = true;
             setState(this.id, true);
         } 
     });
     $("#rectbutton").click(function() {
-        unbind();
-        resetStateAll();
         if (!DRAW_RECT) {
             DRAW_RECT = true;
             setState(this.id, true);
