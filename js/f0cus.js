@@ -59,7 +59,9 @@ function setState(buttonId, isActive) {
     }
 }
 
-//Initialization
+/**
+ * Initialise window variables.
+ */
 window.onload = function() {
     window.paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
     window.MOUSE = new MouseManager();
