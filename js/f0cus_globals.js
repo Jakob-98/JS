@@ -1,13 +1,10 @@
 //global variables
-var
-    PAPER_HEIGHT = 2000,
-    PAPER_WIDTH = Math.round(Math.sqrt(2) * PAPER_HEIGHT),
-    RECT_HEIGHT = 60,
-    RECT_WIDTH = 80,
-    ID_COUNTER = 0;
-
+var PAPER_HEIGHT = 2000;
+var PAPER_WIDTH = Math.round(Math.sqrt(2) * PAPER_HEIGHT);
+var RECT_HEIGHT = 60;
+var RECT_WIDTH = 80;
+var ID_COUNTER = 0;
 
 //drawing variables
-var
-    DRAW_RECT = false,
-    SELECT_ELEM = false;
+var DRAW_RECT = false;
+var SELECT_ELEM = false;

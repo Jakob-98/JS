@@ -1,30 +1,54 @@
+/**
+ * Creates a process step using a temp.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {number} h
+ */
+function crtProcess(x, y, w, h) {
+    ProcessStep.processMain('test' + ID_COUNTER, x, y, w, h);
+}
 
-function crtProcess(x,y,w,h) { //creates a process step using a temp
-    tempBox =  new ProcessStep();
-    ProcessStep.processMain('test' + ID_COUNTER,x,y,w,h);
- }
-
-function unbind(w) { //unbinds various things, w can be used to determine what to unbind
+/**
+ * Unbinds various things, w can be used to determine what to unbind
+ *
+ * @param {number} w
+ */
+function unbind(w) {
     if (DRAW_RECT === true) {
         DRAW_RECT = false;
-        $("#rectbutton").css("color","black")//button turns black again when clicked
+        $("#rectbutton").css("color","black"); //button turns black again when clicked
     } 
-    if (SELECT_ELEM == true && w != 'nselect') { //nselect makes sure select doesnt get unbound if it is bound
+    if (SELECT_ELEM === true && w !== 'nselect') { //nselect makes sure select doesnt get unbound if it is bound
         SELECT_ELEM = false;
-        $("#selectbutton").css("color","black")//button turns black again when clicked
+        $("#selectbutton").css("color","black"); //button turns black again when clicked
     } 
 }
 
-function elementHandler(elSet) { //handles events of the different elements.
+/**
+ * Handles events of the different elements.
+ *
+ * @param elSet
+ */
+function elementHandler(elSet) {
     elSet[0].drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
     elSet.click(function (e) {
         unbind('nselect'); //nselect makes sure select doesnt get unbound if it is bound
-        console.log("clicked:" + $(elSet[0].node).attr('id'))
+        console.log("clicked:" + $(elSet[0].node).attr('id'));
     })
 }
 
-
-function setCreator (x,y,element,name,elSet) { //creates the element set with various extra elements like name
+/**
+ * Creates the element set with various extra elements like name
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param element
+ * @param {string} name
+ * @param elSet
+ */
+function setCreator(x, y, element, name, elSet) {
     var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
     var stepEl = paper.text(x + 7/8 *RECT_WIDTH,y + 7/8 *RECT_HEIGHT,"A" + ID_COUNTER);
     elSet.push (element, nameEl, stepEl);
@@ -37,31 +61,48 @@ function setCreator (x,y,element,name,elSet) { //creates the element set with va
 }
 
 // functions used for dragging objects
-// 
-function dragMove (dx, dy) { //dragMove will be called with dx and dy
-    nowX = Math.min(PAPER_HEIGHT, this.ox + dx);
-    nowY = Math.min(PAPER_WIDTH, this.oy + dy);
+/**
+ * dragMove will be called with dx and dy
+ *
+ * @param {number} dx
+ * @param {number} dy
+ */
+function dragMove(dx, dy) {
+    var nowX = Math.min(PAPER_HEIGHT, this.ox + dx);
+    var nowY = Math.min(PAPER_WIDTH, this.oy + dy);
     nowX = Math.max(0, nowX);
-    nowY = Math.max(0, nowY);            
-    this.attr({x: nowX, y: nowY });
-    this.nameEl.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
-    this.stepEl.attr({x: nowX + 7/8 * RECT_WIDTH , y: nowY + 7/8 * RECT_HEIGHT});
+    nowY = Math.max(0, nowY);
+    this.attr({
+        x: nowX,
+        y: nowY
+    });
+    this.nameEl.attr({
+        x: nowX + 1/2 * RECT_WIDTH,
+        y: nowY + 1/2 * RECT_HEIGHT
+    });
+    this.stepEl.attr({
+        x: nowX + 7/8 * RECT_WIDTH,
+        y: nowY + 7/8 * RECT_HEIGHT
+    });
 }
 
-function dragStart () { //storing original coordinates
+/**
+ * Storing original coordinates
+ */
+function dragStart() {
     this.ox = this.attr("x");
     this.oy = this.attr("y");
-    this.animate({opacity: 0.75}, 150);
+    this.animate({
+        opacity: 0.75
+    }, 150);
 }
 
-function dragUp () { //restoring state
-    this.animate({opacity: .5}, 250);
-    console.log("moved:" + $(this.node).attr('id'))
-}
-//
-// end of functions used for dragging objects
-
-function selectionCrt(e) {
-    var box;
-    var selections = paper.set();
+/**
+ * Restoring state
+ */
+function dragUp() {
+    this.animate({
+        opacity: .5
+    }, 250);
+    console.log("moved:" + $(this.node).attr('id'));
 }

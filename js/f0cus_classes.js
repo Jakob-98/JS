@@ -1,22 +1,18 @@
-// F0CUS CLASS DEFINITIONS
-
-// CLASS ObjectWithXYWH (any drawable object)
-class ObjectWithXYWH {
-    constructor(name,x,y,w,h) {
-      this.name = name;
-      this.x = x;
-      this.y = y;
-      this.w = w;
-      this.h = h;
-    }
-}
-
-//CLASS ProcessStep (aka a rectangle)
-class ProcessStep extends ObjectWithXYWH {
-    constructor(name,x,y,w,h) { //Q! this constructor does nothing atm, should the extends just be removed? 
-        super(name,x,y,w,h);
-    }
-    static processMain(name, x, y, w, h) { //processstep draws itself, when drawing itself it creates an element,
+/**
+ * CLASS ProcessStep (aka a rectangle)
+ */
+class ProcessStep
+{
+    /**
+     * Processstep draws itself, when drawing itself it creates an element
+     *
+     * @param name
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
+    static processMain(name, x, y, w, h) {
         var element = paper.rect(x,y,w,h);//this element is used for various things. 
         element.attr({
             stroke: "#000000",
@@ -26,16 +22,9 @@ class ProcessStep extends ObjectWithXYWH {
         });
 
         var elSet = new paper.set();
-        setCreator(x,y,element,name,elSet);
+        setCreator(x, y, element, name, elSet);
 
         elementHandler(elSet); //handles various events for the element
-
-    }
-}
-//CLASS ProcessLink (not used at this time)
-class ProcessLink extends ObjectWithXYWH {
-    constructor(name) {
-        this.name = name;
     }
 }
 
