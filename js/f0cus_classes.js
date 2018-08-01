@@ -28,21 +28,37 @@ class ProcessStep
     }
 }
 
-// CLASS MOUSEMANAGER
+/**
+ * Class MOUSEMANAGER
+ */
 class MouseManager {
-    constructor(name, lastXDown, lastYDown, lastXUp, lastYUp) {
-        this.name = name,
-        lastXDown = 0; // TO DO add lastXDown etc functionality to mousemanager
-        lastYDown = 0;
-        lastXUp = 0;
-        lastYUp = 0;
-    } 
-     
-     posX(e) {//used to call the current Xposition of mouse relative to the canvas during an event
+    // TODO: add lastXDown etc functionality to mousemanager
+    // constructor(name, lastXDown, lastYDown, lastXUp, lastYUp) {
+    //     this.name = name,
+    //     lastXDown = 0;
+    //     lastYDown = 0;
+    //     lastXUp = 0;
+    //     lastYUp = 0;
+    // }
+
+    /**
+     * Used to call the current Xposition of mouse relative to the canvas during an event
+     *
+     * @param e
+     * @returns {number}
+     */
+     posX(e) {
         var offset = $("#svg_paper").offset();//Q! is this clean code to put offset here?
         return e.pageX - offset.left
      }
-     posY(e) {//used to call the current Yposition of mouse relative to the canvas during an event
+
+    /**
+     * Used to call the current Yposition of mouse relative to the canvas during an event
+     *
+     * @param e
+     * @returns {number}
+     */
+     posY(e) {
         var offset = $("#svg_paper").offset();
         return e.pageY - offset.top
      }
