@@ -23,10 +23,6 @@ function elementHandler(elSet) { //handles events of the different elements.
     })
 }
 
-function selectElements () {
-    unbind();
-    var tempset = new paper.set();
-}
 
 function setCreator (x,y,element,name,elSet) { //creates the element set with various extra elements like name
     var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
@@ -55,12 +51,17 @@ function dragMove (dx, dy) { //dragMove will be called with dx and dy
 function dragStart () { //storing original coordinates
     this.ox = this.attr("x");
     this.oy = this.attr("y");
-    this.attr({opacity: 1});
+    this.animate({opacity: 0.75}, 150);
 }
 
 function dragUp () { //restoring state
-    this.attr({opacity: .5});
+    this.animate({opacity: .5}, 250);
     console.log("moved:" + $(this.node).attr('id'))
 }
 //
 // end of functions used for dragging objects
+
+function selectionCrt(e) {
+    var box;
+    var selections = paper.set();
+}

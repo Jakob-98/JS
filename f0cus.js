@@ -9,7 +9,7 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
         unbind();
     })
     $("#selectbutton").click(function() {
-        selectElements();
+        unbind();
         if (SELECT_ELEM == false) {
             SELECT_ELEM = true;
             $("#selectbutton").css("color","blue")
@@ -34,8 +34,7 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
 //Initialization
 window.onload = function() {
     paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
-    MOUSE = new MouseManager();
-       
+    MOUSE = new MouseManager(); 
 }
 
 
