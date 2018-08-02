@@ -32,13 +32,32 @@ $(function($){
     $("#savebutton").click(function(){
         if (!$("#savebutton").isActive) {
             setState(this.id, true);
-            SAVED_JSON = paper.toJSON();
+            SAVED_JSON = paper.toJSON(function(el, data) {
+                // Save the set identifier along with the other data
+                data.setName = el.setName;
+                data.isDraggable = true;
+
+            
+                return data;
+            });
         }
     });    
     $("#loadbutton").click(function(){
         if (!$("#loadbutton").isActive) {
             setState(this.id, true);
-            paper.fromJSON(SAVED_JSON);
+            window.paper.clear();
+            paper.fromJSON(SAVED_JSON, function(el, data) {
+                // Recreate the set using the identifier
+                if ( !window[data.setName] ) window[data.setName] = paper.set();
+
+                if ( data.isDraggable ) {
+                    el.drag(dragStart, dragMove, dragUp);
+                }
+                // Place each element back into the set
+                window[data.setName].push(el);
+            
+                return el;
+            });
         }
     });
 });

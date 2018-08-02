@@ -9,7 +9,7 @@ function elementHandler(elSet) { //handles events of the different elements.
     elSet[0].drag(dragMove, dragStart, dragUp); //enables dragging with the drag functions
     elSet.click(function (e) {
         resetStateAll();
-        console.log("clicked:" + $(elSet[0].node).attr('id'))
+        console.log("clicked:" + this.setName)
     })
 }
 
@@ -18,12 +18,15 @@ function setCreator (x,y,element,name,elSet) { //creates the element set with va
     var nameEl = paper.text(x + 1/2 *RECT_WIDTH,y + 1/2 *RECT_HEIGHT,name);
     var stepEl = paper.text(x + 7/8 *RECT_WIDTH,y + 7/8 *RECT_HEIGHT,"A" + ID_COUNTER);
     elSet.push (element, nameEl, stepEl);
+    for (i in elSet) {
+        elSet[i].setName = "setNr" + ID_COUNTER
+    }
     element.nameEl = nameEl; //nameEl is paired to element, so if you move element they both move, see dragMove
     element.stepEl = stepEl;
     console.log(elSet);
     $(elSet[0].node).attr('id',"rect " + ID_COUNTER);//gives the element node an ID.
     ID_COUNTER += 1;
-    console.log("set made with id:" + $(element.node).attr('id'));
+    console.log("set made with id:" + element.setName);
 }
 
 // functions used for dragging objects
@@ -46,7 +49,7 @@ function dragStart () { //storing original coordinates
 
 function dragUp () { //restoring state
     this.animate({opacity: .5}, 250);
-    console.log("moved:" + $(this.node).attr('id'))
+    console.log("moved:" + this.setName)
 }
 //
 // end of functions used for dragging objects
@@ -55,64 +58,3 @@ function selectionCrt(e) {
     var box;
     var selections = paper.set();
 }
-
-(function() {
-	Raphael.fn.toJSON = function(callback) {
-		var
-			data,
-			elements = new Array,
-			paper    = this
-			;
-
-		for ( var el = paper.bottom; el != null; el = el.next ) {
-			data = callback ? callback(el, new Object) : new Object;
-
-			if ( data ) elements.push({
-				data:      data,
-				type:      el.type,
-				attrs:     el.attrs,
-				transform: el.matrix.toTransformString(),
-				id:        el.id
-				});
-		}
-
-		var cache = [];
-		var o = JSON.stringify(elements, function (key, value) {
-		    //http://stackoverflow.com/a/11616993/400048
-		    if (typeof value === 'object' && value !== null) {
-		        if (cache.indexOf(value) !== -1) {
-		            // Circular reference found, discard key
-		            return;
-		        }
-		        // Store value in our collection
-		        cache.push(value);
-		    }
-		    return value;
-		});
-		cache = null;
-		return o;
-	}
-
-	Raphael.fn.fromJSON = function(json, callback) {
-		var
-			el,
-			paper = this
-			;
-
-		if ( typeof json === 'string' ) json = JSON.parse(json);
-
-		for ( var i in json ) {
-			if ( json.hasOwnProperty(i) ) {
-				el = paper[json[i].type]()
-					.attr(json[i].attrs)
-					.transform(json[i].transform);
-
-				el.id = json[i].id;
-
-				if ( callback ) el = callback(el, json[i].data);
-
-				if ( el ) paper.set().push(el);
-			}
-		}
-	}
-})();
