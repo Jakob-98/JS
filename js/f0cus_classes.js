@@ -29,9 +29,6 @@ class ProcessStep extends ObjectWithXYWH {
         setCreator(x,y,element,name,elSet);
 
         elementHandler(elSet); //handles various events for the element
-        console.log(element.node);
-        
-        JSON_NODS += toJSON(element.node);
 
     }
 }

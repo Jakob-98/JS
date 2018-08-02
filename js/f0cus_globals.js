@@ -11,4 +11,4 @@ var
 var
     DRAW_RECT = false;
     SELECT_ELEM = false;
-    JSON_NODES = [];
+    SAVED_JSON = null;

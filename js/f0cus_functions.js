@@ -56,77 +56,63 @@ function selectionCrt(e) {
     var selections = paper.set();
 }
 
-function toJSON(node) {
-    node = node || this;
-    var obj = {
-      nodeType: node.nodeType
-    };
-    if (node.tagName) {
-      obj.tagName = node.tagName.toLowerCase();
-    } else
-    if (node.nodeName) {
-      obj.nodeName = node.nodeName;
-    }
-    if (node.nodeValue) {
-      obj.nodeValue = node.nodeValue;
-    }
-    var attrs = node.attributes;
-    if (attrs) {
-      var length = attrs.length;
-      var arr = obj.attributes = new Array(length);
-      for (var i = 0; i < length; i++) {
-        attr = attrs[i];
-        arr[i] = [attr.nodeName, attr.nodeValue];
-      }
-    }
-    var childNodes = node.childNodes;
-    if (childNodes) {
-      length = childNodes.length;
-      arr = obj.childNodes = new Array(length);
-      for (i = 0; i < length; i++) {
-        arr[i] = toJSON(childNodes[i]);
-      }
-    }
-    return obj;
-  }
+(function() {
+	Raphael.fn.toJSON = function(callback) {
+		var
+			data,
+			elements = new Array,
+			paper    = this
+			;
 
-  function toDOM(obj) {
-    if (typeof obj == 'string') {
-      obj = JSON.parse(obj);
-    }
-    var node, nodeType = obj.nodeType;
-    switch (nodeType) {
-      case 1: //ELEMENT_NODE
-        node = document.createElement(obj.tagName);
-        var attributes = obj.attributes || [];
-        for (var i = 0, len = attributes.length; i < len; i++) {
-          var attr = attributes[i];
-          node.setAttribute(attr[0], attr[1]);
-        }
-        break;
-      case 3: //TEXT_NODE
-        node = document.createTextNode(obj.nodeValue);
-        break;
-      case 8: //COMMENT_NODE
-        node = document.createComment(obj.nodeValue);
-        break;
-      case 9: //DOCUMENT_NODE
-        node = document.implementation.createDocument();
-        break;
-      case 10: //DOCUMENT_TYPE_NODE
-        node = document.implementation.createDocumentType(obj.nodeName);
-        break;
-      case 11: //DOCUMENT_FRAGMENT_NODE
-        node = document.createDocumentFragment();
-        break;
-      default:
-        return node;
-    }
-    if (nodeType == 1 || nodeType == 11) {
-      var childNodes = obj.childNodes || [];
-      for (i = 0, len = childNodes.length; i < len; i++) {
-        node.appendChild(toDOM(childNodes[i]));
-      }
-    }
-    return node;
-  }
+		for ( var el = paper.bottom; el != null; el = el.next ) {
+			data = callback ? callback(el, new Object) : new Object;
+
+			if ( data ) elements.push({
+				data:      data,
+				type:      el.type,
+				attrs:     el.attrs,
+				transform: el.matrix.toTransformString(),
+				id:        el.id
+				});
+		}
+
+		var cache = [];
+		var o = JSON.stringify(elements, function (key, value) {
+		    //http://stackoverflow.com/a/11616993/400048
+		    if (typeof value === 'object' && value !== null) {
+		        if (cache.indexOf(value) !== -1) {
+		            // Circular reference found, discard key
+		            return;
+		        }
+		        // Store value in our collection
+		        cache.push(value);
+		    }
+		    return value;
+		});
+		cache = null;
+		return o;
+	}
+
+	Raphael.fn.fromJSON = function(json, callback) {
+		var
+			el,
+			paper = this
+			;
+
+		if ( typeof json === 'string' ) json = JSON.parse(json);
+
+		for ( var i in json ) {
+			if ( json.hasOwnProperty(i) ) {
+				el = paper[json[i].type]()
+					.attr(json[i].attrs)
+					.transform(json[i].transform);
+
+				el.id = json[i].id;
+
+				if ( callback ) el = callback(el, json[i].data);
+
+				if ( el ) paper.set().push(el);
+			}
+		}
+	}
+})();

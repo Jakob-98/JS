@@ -29,9 +29,16 @@ $(function($){
             crtProcess(window.MOUSE.posX(e) - 30, window.MOUSE.posY(e) - 25, RECT_WIDTH, RECT_HEIGHT);
         } 
     })
-    $("#testbutton").click(function(){
-        if (!$("#testbutton").isActive) {
+    $("#savebutton").click(function(){
+        if (!$("#savebutton").isActive) {
             setState(this.id, true);
+            SAVED_JSON = paper.toJSON();
+        }
+    });    
+    $("#loadbutton").click(function(){
+        if (!$("#loadbutton").isActive) {
+            setState(this.id, true);
+            paper.fromJSON(SAVED_JSON);
         }
     });
 });
@@ -43,7 +50,8 @@ function resetStateAll() {
     setState('unbindbutton', false);
     setState('selectbutton', false);
     setState('rectbutton', false);
-    setState('testbutton', false);
+    setState('savebutton', false);
+    setState('loadbutton', false);
     SELECT_ELEM = false;
     DRAW_RECT = false;
 }
