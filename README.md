@@ -1,4 +1,4 @@
-# JS
+# F0cus
 f0cus project
 
 TO DO: Add a readme. 
