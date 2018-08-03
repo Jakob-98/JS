@@ -16,6 +16,7 @@ $(function($){
         if (!$("#selectbutton").isActive){
             SELECT_ELEM = true;
             setState(this.id, true);
+            test();
         } 
     });
     $("#rectbutton").click(function() {
@@ -27,7 +28,10 @@ $(function($){
     $("#svg_paper").click(function(e) {
         if (DRAW_RECT) {
             crtProcess(window.MOUSE.posX(e) - 30, window.MOUSE.posY(e) - 25, RECT_WIDTH, RECT_HEIGHT);
-        } 
+        } else {
+           // selectionCrt(e)
+        }
+        
     })
     $("#savebutton").click(function(){
         if (!$("#savebutton").isActive) {
@@ -35,8 +39,7 @@ $(function($){
             SAVED_JSON = paper.toJSON(function(el, data) {
                 // Save the set identifier along with the other data
                 data.setName = el.setName;
-                data.isDraggable = true;
-
+ //               data.isDraggable = true;
             
                 return data;
             });
@@ -50,12 +53,11 @@ $(function($){
                 // Recreate the set using the identifier
                 if ( !window[data.setName] ) window[data.setName] = paper.set();
 
-                if ( data.isDraggable ) {
-                    el.drag(dragStart, dragMove, dragUp);
-                }
+                // if ( data.isDraggable ) {
+                //     el.drag(dragStart, dragMove, dragUp);
+                // }
                 // Place each element back into the set
                 window[data.setName].push(el);
-            
                 return el;
             });
         }
@@ -97,3 +99,11 @@ window.onload = function() {
     window.paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
     window.MOUSE = new MouseManager();
 };
+
+function test(e) {
+    if (SELECT_ELEM) {
+        var mat = paper.rect(0, 0, paper.width, paper.height).attr("fill", "#FFF");
+        mat.drag(foo, bar, bee);
+    }
+}
+var box;

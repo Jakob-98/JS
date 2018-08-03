@@ -22,15 +22,14 @@ class ProcessStep extends ObjectWithXYWH {
             stroke: "#000000",
             fill: "gray",
             opacity: 0.5,
-            cursor: "pointer"
+            cursor: "pointer",
         });
+        this.ID = "ProcessStep"; //TODO this might be replaced by get type, but then dragmove and elementhandler has to be altered. 
 
         var elSet = new paper.set();
         setCreator(x,y,element,name,elSet);
 
         elementHandler(elSet); //handles various events for the element
-
-
     }
 }
 

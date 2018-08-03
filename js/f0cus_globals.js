@@ -9,6 +9,6 @@ var
 
 //drawing variables
 var
-    DRAW_RECT = false;
-    SELECT_ELEM = false;
+    DRAW_RECT = false,
+    SELECT_ELEM = false,
     SAVED_JSON = null;

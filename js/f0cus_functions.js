@@ -31,30 +31,89 @@ function setCreator (x,y,element,name,elSet) { //creates the element set with va
 
 // functions used for dragging objects
 // 
-function dragMove (dx, dy) { //dragMove will be called with dx and dy
-    nowX = Math.min(PAPER_HEIGHT, this.ox + dx);
-    nowY = Math.min(PAPER_WIDTH, this.oy + dy);
-    nowX = Math.max(0, nowX);
-    nowY = Math.max(0, nowY);            
-    this.attr({x: nowX, y: nowY });
-    this.nameEl.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
-    this.stepEl.attr({x: nowX + 7/8 * RECT_WIDTH , y: nowY + 7/8 * RECT_HEIGHT});
+function dragMove (dx, dy, x ,y, event) { //dragMove will be called with dx and dy
+    if (this.ID = "ProcessStep") {
+        nowX = Math.min(PAPER_HEIGHT, this.ox + dx);
+        nowY = Math.min(PAPER_WIDTH, this.oy + dy);
+        nowX = Math.max(0, nowX);
+        nowY = Math.max(0, nowY);            
+        this.attr({x: nowX, y: nowY });
+        this.nameEl.attr({x: nowX + 1/2 * RECT_WIDTH , y: nowY + 1/2 * RECT_HEIGHT});
+        this.stepEl.attr({x: nowX + 7/8 * RECT_WIDTH , y: nowY + 7/8 * RECT_HEIGHT});
+    } else if (this.ID = "Selection") {
+        var xoffset = 0,
+        yoffset = 0;
+    if (dx < 0) {
+        xoffset = dx;
+        dx = -1 * dx;
+    }
+    if (dy < 0) {
+        yoffset = dy;
+        dy = -1 * dy;
+    }
+    box.transform("T" + xoffset + "," + yoffset);
+    box.attr("width", dx);    
+    box.attr("height", dy);    
+    }
+}    
+function dragStart (x, y, event) { //storing original coordinates
+    if (this.ID = "ProcessStep") {
+        this.ox = this.attr("x");
+        this.oy = this.attr("y");
+        this.animate({opacity: 0.75}, 150);
+    } else if (this.ID = "Selection") {
+        box = paper.rect(x, y, 0, 0).attr("stroke", "#9999FF");
+    }
 }
 
-function dragStart () { //storing original coordinates
-    this.ox = this.attr("x");
-    this.oy = this.attr("y");
-    this.animate({opacity: 0.75}, 150);
-}
-
-function dragUp () { //restoring state
-    this.animate({opacity: .5}, 250);
-    console.log("moved:" + this.setName)
+function dragUp (event) { //restoring state  
+    if (this.ID = "ProcessStep") {
+        this.animate({opacity: .5}, 250);
+        console.log("moved:" + this.setName)
+    } else if (this.ID = "Selection") {
+        
+    }
 }
 //
 // end of functions used for dragging objects
 
 function selectionCrt(e) {
-    var box;
-    var selections = paper.set();
+    // var SELECTBOX = paper.rect(0, 0, paper.width, paper.height).attr("fill", "#FFF");
+    // SELECTBOX.ID = "Selection";
+    // var box;
+    // var selections = paper.set();
+}
+
+
+
+
+
+
+
+function foo (x, y, event) {
+    box = paper.rect(x, y, 0, 0).attr("stroke", "#9999FF");    
+}
+
+//when mouse moves during drag, adjust box. If to left or above original point, you have to translate the whole box and invert the dx or dy values since .rect() doesn't take negative width or height
+function bar (dx, dy, x, y, event) {
+    var xoffset = 0,
+        yoffset = 0;
+    if (dx < 0) {
+        xoffset = dx;
+        dx = -1 * dx;
+    }
+    if (dy < 0) {
+        yoffset = dy;
+        dy = -1 * dy;
+    }
+    box.transform("T" + xoffset + "," + yoffset);
+    box.attr("width", dx);    
+    box.attr("height", dy);    
+}
+
+
+
+function bee (event) {
+    //get the bounds of the selections
+    var bounds = box.getBBox();
 }
