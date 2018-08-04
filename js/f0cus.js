@@ -16,7 +16,6 @@ $(function($){
         if (!$("#selectbutton").isActive){
             SELECT_ELEM = true;
             setState(this.id, true);
-            test();
         } 
     });
     $("#rectbutton").click(function() {
@@ -28,10 +27,7 @@ $(function($){
     $("#svg_paper").click(function(e) {
         if (DRAW_RECT) {
             crtProcess(window.MOUSE.posX(e) - 30, window.MOUSE.posY(e) - 25, RECT_WIDTH, RECT_HEIGHT);
-        } else {
-           // selectionCrt(e)
         }
-        
     })
     $("#savebutton").click(function(){
         if (!$("#savebutton").isActive) {
@@ -100,10 +96,3 @@ window.onload = function() {
     window.MOUSE = new MouseManager();
 };
 
-function test(e) {
-    if (SELECT_ELEM) {
-        var mat = paper.rect(0, 0, paper.width, paper.height).attr("fill", "#FFF");
-        mat.drag(foo, bar, bee);
-    }
-}
-var box;
