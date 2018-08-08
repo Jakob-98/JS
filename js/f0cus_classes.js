@@ -24,11 +24,10 @@ class ProcessStep extends ObjectWithXYWH {
             opacity: 0.5,
             cursor: "pointer",
         });
-        this.ID = "ProcessStep"; //TODO this might be replaced by get type, but then dragmove and elementhandler has to be altered. 
+       // DRAWN_RECTS += element; //using this to test the line draring
 
         var elSet = new paper.set();
         setCreator(x,y,element,name,elSet);
-
         elementHandler(elSet); //handles various events for the element
     }
 }

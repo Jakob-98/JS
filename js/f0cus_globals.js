@@ -11,4 +11,5 @@ var
 var
     DRAW_RECT = false,
     SELECT_ELEM = false,
-    SAVED_JSON = null;
+    SAVED_JSON = null,
+    DRAWN_RECTS = []; //temp var for testing use line drawing

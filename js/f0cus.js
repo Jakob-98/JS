@@ -24,6 +24,13 @@ $(function($){
             setState(this.id, true);
         }
     });
+    $("#testbutton").click(function() { //button used for testing various things
+        if (!$("#testbutton").isActive) {
+            setState(this.id, true);
+            drawLine();
+
+        }
+    });
     $("#svg_paper").click(function(e) {
         if (DRAW_RECT) {
             crtProcess(window.MOUSE.posX(e) - 30, window.MOUSE.posY(e) - 25, RECT_WIDTH, RECT_HEIGHT);
@@ -35,7 +42,7 @@ $(function($){
             SAVED_JSON = paper.toJSON(function(el, data) {
                 // Save the set identifier along with the other data
                 data.setName = el.setName;
- //               data.isDraggable = true;
+                data.isDraggable = true;
             
                 return data;
             });
@@ -49,11 +56,14 @@ $(function($){
                 // Recreate the set using the identifier
                 if ( !window[data.setName] ) window[data.setName] = paper.set();
 
-                // if ( data.isDraggable ) {
-                //     el.drag(dragStart, dragMove, dragUp);
-                // }
-                // Place each element back into the set
+                el.setName = data.setName;
+               // Place each element back into the set
                 window[data.setName].push(el);
+
+
+                if ( data.isDraggable ) {
+                    el.drag(dragStart, dragMove, dragUp);
+                }
                 return el;
             });
         }
@@ -69,6 +79,7 @@ function resetStateAll() {
     setState('rectbutton', false);
     setState('savebutton', false);
     setState('loadbutton', false);
+    setState('testbutton', false);
     SELECT_ELEM = false;
     DRAW_RECT = false;
 }
