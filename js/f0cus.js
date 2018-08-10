@@ -1,16 +1,13 @@
 /**
  * Adding click functionality to the buttons, these clickevents should be moved, but not sure where yet.
  */
-$("#clearbutton").click(function() {
-    window.paper.clear();
-});
 $(function($){
     $('.btn').click(function () {
         resetStateAll();
-    // });
-    // $("#clearbutton").click(function() {
-    //     window.paper.clear();
-    // });
+    });
+    $("#clearbutton").click(function() {
+        window.paper.clear();
+    });
     // TODO: Actually make the unbind button functionallity.
     // $("#unbindbutton").click(function() {
     //     resetStateAll(); 
@@ -108,5 +105,4 @@ function setState(buttonId, isActive) {
 window.onload = function() {
     window.paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
     window.MOUSE = new MouseManager();
-};
-
+}
