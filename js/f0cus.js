@@ -1,32 +1,6 @@
 //main JS file project
 
 
-$(function($){//adding click functionality to the buttons, these clickevents should be moved, but not sure where yet.
-    $("#clearbutton").click(function() {
-        paper.clear();
-    })
-    $("#unbindbutton").click(function() {
-        unbind();
-    })
-    $("#selectbutton").click(function() {
-        unbind();
-        if (SELECT_ELEM == false) {
-            SELECT_ELEM = true;
-            $("#selectbutton").css("color","blue")
-        } 
-    })
-    $("#rectbutton").click(function() {
-        unbind();
-        if (DRAW_RECT == false) {
-            DRAW_RECT = true;
-            $("#rectbutton").css("color","blue")
-        } 
-    })
-
-})
-    
-
-
 //Initialization
 window.onload = function() {
     paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
@@ -45,7 +19,55 @@ window.onload = function() {
     $("#svg_paper").mousemove(function(e) {
         MOUSE.mouseMove(e);
     });
+    $('.btn').click(function(e) {
+        btnClick(e);
+    });
 }
 
+function btnClick(e) {
+    resetStateAll();
+    switch (e.currentTarget.id) {
+        case 'rectbutton':
+            setState(e.currentTarget.id, true);
+            e.currentTarget.style.background ='grey'
+            DRAW_RECT = true;
+            break;
+        case 'selectbutton':
+            setState(e.currentTarget.id, true);
+            e.currentTarget.style.background ='grey'
+            SELECT_ELEM = true;
+        
+        default:
+            break;
+    }
+}
 
+function resetStateAll() {
+    $('.btn').each(function () { 
+        this.style.background = "black";
+    });
+    setState('clearbutton', false);
+    setState('unbindbutton', false);
+    setState('selectbutton', false);
+    setState('rectbutton', false);
+    DRAW_RECT = false;
+    SELECT_ELEM = false;
+}
 
+/**
+ * Set a button to active or inactive
+ *
+ * @param {string} buttonId
+ * @param {boolean} isActive
+ */
+function setState(buttonId, isActive) {
+    var element = $('#' + buttonId);
+
+    if (isActive) {
+        element.removeClass('btn-primary');
+        element.addClass('btn-secondary');
+    } else {
+        element.addClass('btn-primary');
+        element.removeClass('btn-secondary');
+    }
+}

@@ -55,8 +55,8 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 	onElement () { //returns true if element is under cursor, adds element to selection
 		if (Math.abs(MOUSE.getPosXDown() - this.x) <= 0.5 * RECT_WIDTH &&
 		Math.abs(MOUSE.getPosYDown() - this.y) <= 0.5 * RECT_HEIGHT) {
-			MODEL.selection.push(this); //add the clicked element to the selection
-			return true;
+			ONELEMENT = true; 
+			return this;
 		} else {
 			return false;
 		}
@@ -105,33 +105,43 @@ class MouseManager {
 		this.pageYDown = e.pageY;
 		if (MODEL.processes.length > 0) {
 			for (var process of MODEL.processes) {
-				ONELEMENT = process.onElement();
-				if (ONELEMENT) break;
+				process.onElement();
+				if (ONELEMENT) {
+					MODEL.selection.push(process);
+					break;
+				}
 			}
 		}
 	}
 	mouseUp(e) {
-		this.pageXUp = e.pageX;
 		this.pageYUp = e.pageY;
-		if (ONELEMENT == false){
-			MODEL.addProcess(A0);
-			MODEL.reDraw();	
-		} else {
-			MODEL.selection[0].x = this.getPosXUp();
-			MODEL.selection[0].y = this.getPosYUp();
-			MODEL.clearSelection();
-			MODEL.reDraw();
-		}
-		ONELEMENT = false;
+		this.pageXUp = e.pageX;
+			if (ONELEMENT == false){
+				if (DRAW_RECT) {
+					MODEL.addProcess(A0);
+				}
+				MODEL.reDraw();	
+			} else {
+				MODEL.selection[0].x = this.getPosXUp();
+				MODEL.selection[0].y = this.getPosYUp();
+				MODEL.reDraw();
+				if (!SELECT_ELEM) {
+					MODEL.clearSelection();
+				} 
+			}
+			ONELEMENT = false;
 	}
 	mouseMove(e) { 
 		if (ONELEMENT == false){
 			return;
 		} else {
-			MODEL.selection[0].x = e.pageX - PAPER_OFFSET.left;
-			MODEL.selection[0].y = e.pageY - PAPER_OFFSET.top;
+			for (var selected of MODEL.selection) {
+				selected.x = e.pageX - PAPER_OFFSET.left + (MODEL.selection[0].x - selected.x);
+				selected.y = e.pageY - PAPER_OFFSET.top + (MODEL.selection[0].y - selected.y);
+				}
 			MODEL.reDraw();
 		}
 	}
+
 }
 //END CLASS MouseManager
