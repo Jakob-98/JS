@@ -34,6 +34,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 		this.shape = null;
 		this.fillColor = '#DCDCDC';
 		this.stepNr = 0;
+		this.relativePos = {x : 0, y : 0};
 	}
 	doDraw() { //draw itself
 		if (MODEL.selection.includes(this)) { //changes color when selected
@@ -103,14 +104,23 @@ class MouseManager {
 	mouseDown(e) {
 		this.pageXDown = e.pageX;
 		this.pageYDown = e.pageY;
+
+		if (!SELECT_ELEM) {
+			MODEL.clearSelection();
+		} 
+		
 		if (MODEL.processes.length > 0) {
 			for (var process of MODEL.processes) {
 				process.onElement();
 				if (ONELEMENT) {
 					MODEL.selection.push(process);
-					break;
+					break; //only push one item per selection click
 				}
 			}
+			for (var selected of MODEL.selection) {
+				selected.relativePos.x = selected.x - this.pageXDown;
+				selected.relativePos.y = selected.y - this.pageYDown;
+ 			}
 		}
 	}
 	mouseUp(e) {
@@ -121,24 +131,18 @@ class MouseManager {
 					MODEL.addProcess(A0);
 				}
 				MODEL.reDraw();	
-			} else {
-				MODEL.selection[0].x = this.getPosXUp();
-				MODEL.selection[0].y = this.getPosYUp();
-				MODEL.reDraw();
-				if (!SELECT_ELEM) {
-					MODEL.clearSelection();
-				} 
-			}
+			} 
 			ONELEMENT = false;
+			MODEL.reDraw();
 	}
 	mouseMove(e) { 
 		if (ONELEMENT == false){
 			return;
 		} else {
 			for (var selected of MODEL.selection) {
-				selected.x = e.pageX - PAPER_OFFSET.left + (MODEL.selection[0].x - selected.x);
-				selected.y = e.pageY - PAPER_OFFSET.top + (MODEL.selection[0].y - selected.y);
-				}
+				selected.x = e.pageX + selected.relativePos.x
+				selected.y = e.pageY+ selected.relativePos.y
+			}
 			MODEL.reDraw();
 		}
 	}
