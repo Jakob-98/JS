@@ -1,24 +1,33 @@
 <!DOCTYPE html>
+<meta charset="utf-8"/>
 <html>
     <head>
         <title>F0cus</title>
-        <script type="text/javascript" src="jquery.min.js"></script>
-        <script type="text/javascript" src="raphael.js"></script>
-        <script type="text/javascript" src="f0cus.js"></script>
-        <script type="text/javascript" src="f0cus_globals.js"></script>
-        <script type="text/javascript" src="f0cus_functions.js"></script>
-        <script type="text/javascript" src="f0cus_classes.js"></script>
-        <script type="stylesheet" src="f0cus.css"></script>
+        <link rel="stylesheet" src="css\f0cus.css"></script>
+        <script type="text/javascript" src="js\jquery.min.js"></script>
+        <script type="text/javascript" src="js\raphael.js"></script>
+        <script type="text/javascript" src="js\f0cus_globals.js"></script>
+        <script type="text/javascript" src="js\f0cus_functions.js"></script>
+        <script type="text/javascript" src="js\f0cus_classes.js"></script>
+        <script type="text/javascript" src="js\f0cus.js"></script>
 
-
-    <input id="clearbutton" value="Clear" type="button"/>
-    <input id="rectbutton" value="Rectangle" type="button"/>
-    <input id="selectbutton" value="Select" type="button"/>
-    <input id="unbindbutton" value="Unbind" type="button"/>
-
-    
     </head>
     <body>
-        <div class="paper" id="svg_paper"></div>
+            <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input class='btn' id="clearbutton" value="Clear" type="button" style="background: black none repeat scroll 0% 0%;" >
+                            <input class='btn' id="rectbutton" value="Rectangle" type="button" style="background: black none repeat scroll 0% 0%;">
+                            <input class='btn' id="selectbutton" value="Select" type="button" style="background: black none repeat scroll 0% 0%;">
+                            <input class='btn' id="unbindbutton" value="Unbind" type="button" style="background: black none repeat scroll 0% 0%;">
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-md-12">
+                            <div class="paper" id="svg_paper"></div>
+                        </div>
+                    </div>
+                </div>
+        
     </body>
 </html>
