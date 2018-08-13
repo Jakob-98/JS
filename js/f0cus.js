@@ -3,7 +3,7 @@
 
 $(function($){//adding click functionality to the buttons, these clickevents should be moved, but not sure where yet.
     $("#clearbutton").click(function() {
-                paper.clear();
+        paper.clear();
     })
     $("#unbindbutton").click(function() {
         unbind();
@@ -22,11 +22,7 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
             $("#rectbutton").css("color","blue")
         } 
     })
-    $("#svg_paper").click(function(e) {
-        if (DRAW_RECT == true) {
-            crtProcess(MOUSE.posX(e) -30,MOUSE.posY(e)-25 ,RECT_WIDTH,RECT_HEIGHT);
-        }
-    })
+
 })
     
 
@@ -34,7 +30,21 @@ $(function($){//adding click functionality to the buttons, these clickevents sho
 //Initialization
 window.onload = function() {
     paper = Raphael("svg_paper", PAPER_HEIGHT, PAPER_WIDTH);
-    MOUSE = new MouseManager(); 
+    MOUSE = new MouseManager();
+    MODEL = new Model();
+    A0 = new Process(null);
+    CONTEXT = new Process(null);
+    PAPER_OFFSET =  $("#svg_paper").offset();
+
+    $("#svg_paper").mousedown(function(e) {
+        MOUSE.mouseDown(e);
+    });
+    $("#svg_paper").mouseup(function(e) {
+        MOUSE.mouseUp(e);
+    });
+    $("#svg_paper").mousemove(function(e) {
+        MOUSE.mouseMove(e);
+    });
 }
 
 
