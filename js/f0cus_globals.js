@@ -10,6 +10,7 @@ var
 var
     DRAW_RECT = false,
     SELECT_ELEM = false;
+    LINK_ELEM = false;
 
 var 
     ONELEMENT = false;

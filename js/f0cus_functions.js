@@ -13,6 +13,11 @@ function btnClick(e) {
             setState(e.currentTarget.id, true);
             e.currentTarget.style.background ='grey'
             SELECT_ELEM = true;
+        case 'linkbutton':
+            setState(e.currentTarget.id, true);
+            e.currentTarget.style.background ='grey'
+            LINK_ELEM = true;
+            break;
         
         default:
             break;
@@ -27,8 +32,10 @@ function resetStateAll() {
     setState('unbindbutton', false);
     setState('selectbutton', false);
     setState('rectbutton', false);
+    setState('linkbutton', false);
     DRAW_RECT = false;
     SELECT_ELEM = false;
+    LINK_ELEM = false;
 }
 
 /**

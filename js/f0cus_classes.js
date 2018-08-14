@@ -4,7 +4,9 @@
 class Model {
 	constructor() {
 		this.processes = [];
+		this.pLinks = [];
 		this.selection = [];
+		this.activeLink = null;
 	}
 	addProcess (Parent) { //adding a process to the model, called by MOUSE
 		var p = new Process(Parent); 
@@ -15,9 +17,24 @@ class Model {
 		p.doDraw();
 		console.log("process created on:"+p.x+":"+p.y); 
 	}
+	addLink () {
+		var l = new Link();
+		this.pLinks.push(l);
+		this.activeLink = l;
+		l.x = MOUSE.getPosXDown();
+		l.y = MOUSE.getPosYDown();
+		l.xEnd = MOUSE.getPosXDown();
+		l.yEnd = MOUSE.getPosYDown();
+		l.doDraw();
+	}
 	reDraw() { //redrawing the model, drawing each element of MODEL
 		paper.clear();
-		for (var procces of this.processes) procces.doDraw();
+		for (var procces of this.processes) {
+			procces.doDraw();
+		}
+		for (var links of this.pLinks) {
+			links.doDraw();
+		}
 	}
 	clearSelection () { //clear the selection
 		this.selection = [];
@@ -59,7 +76,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 			ONELEMENT = true; 
 			return this;
 		} else {
-			return false;
+			return;
 		}
 	}
 	calcStepNr() { //calculate which step this is
@@ -74,6 +91,20 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 }
 //END CLASS Process
 
+//CLASS Link
+class Link {
+	constructor() {
+		this.shape = null;
+	}
+	doDraw() {
+		var path = ["M", this.x, this.y, "L", this.xEnd, this.yEnd];
+
+		if (this.shape) this.shape.remove();
+		this.shape = paper.set();
+		this.shape.push(paper.path(path));
+	}
+}
+//END CLASS Link
 
 // CLASS MouseManager
 class MouseManager {
@@ -109,7 +140,7 @@ class MouseManager {
 			MODEL.clearSelection();
 		} 
 		
-		if (MODEL.processes.length > 0) {
+		if (MODEL.processes.length > 0 && !LINK_ELEM) {
 			for (var process of MODEL.processes) {
 				process.onElement();
 				if (ONELEMENT) {
@@ -122,26 +153,34 @@ class MouseManager {
 				selected.relativePos.y = selected.y - this.pageYDown;
  			}
 		}
+		if (LINK_ELEM) { 
+			MODEL.addLink();			
+		}
 	}
 	mouseUp(e) {
 		this.pageYUp = e.pageY;
 		this.pageXUp = e.pageX;
-			if (ONELEMENT == false){
+			if (!ONELEMENT){
 				if (DRAW_RECT) {
 					MODEL.addProcess(A0);
 				}
 				MODEL.reDraw();	
 			} 
 			ONELEMENT = false;
+			MODEL.activeLink = null;
 			MODEL.reDraw();
 	}
 	mouseMove(e) { 
-		if (ONELEMENT == false){
-			return;
+		if (!ONELEMENT){
+			if (LINK_ELEM && MODEL.activeLink) {
+				MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
+				MODEL.activeLink.yEnd = e.pageY - PAPER_OFFSET.top;
+				MODEL.reDraw();
+			}
 		} else {
 			for (var selected of MODEL.selection) {
-				selected.x = e.pageX + selected.relativePos.x
-				selected.y = e.pageY+ selected.relativePos.y
+				selected.x = e.pageX + selected.relativePos.x;
+				selected.y = e.pageY + selected.relativePos.y;
 			}
 			MODEL.reDraw();
 		}
