@@ -95,13 +95,23 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 class Link {
 	constructor() {
 		this.shape = null;
+		this.pathAttr = {
+			'arrow-end':   'classic-wide-long',
+			'opacity' : 1
+		}
 	}
 	doDraw() {
 		var path = ["M", this.x, this.y, "L", this.xEnd, this.yEnd];
-
+		if (this === MODEL.activeLink) {
+			this.pathAttr['opacity'] = 0.5;	
+			this.pathAttr['stroke-dasharray'] = "--";	
+		} else {
+			this.pathAttr['opacity'] = 1;	
+			this.pathAttr['stroke-dasharray'] = undefined;	
+		}
 		if (this.shape) this.shape.remove();
 		this.shape = paper.set();
-		this.shape.push(paper.path(path));
+		this.shape.push(paper.path(path).attr(this.pathAttr));
 	}
 }
 //END CLASS Link
