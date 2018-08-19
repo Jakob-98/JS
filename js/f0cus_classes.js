@@ -107,7 +107,10 @@ class Link {
 			this.x = this.P1.x;
 			this.y = this.P1.y;
 		}
-		var path = ["M", this.x, this.y, "L", this.xEnd, this.yEnd];
+		var path = ["M", this.x, this.y, "L", 0.5*(this.xEnd+this.x), this.y];
+		var path2 = ["M", 0.5*(this.xEnd+this.x), this.y, "L", 0.5*(this.xEnd+this.x), this.yEnd];
+		var path3 = ["M", 0.5*(this.xEnd+this.x), this.yEnd, "L", this.xEnd, this.yEnd];
+
 		if (this === MODEL.activeLink) {
 			this.pathAttr['opacity'] = 0.5;	
 			this.pathAttr['stroke-dasharray'] = "--";	
@@ -118,6 +121,8 @@ class Link {
 		if (this.shape) this.shape.remove();
 		this.shape = paper.set();
 		this.shape.push(paper.path(path).attr(this.pathAttr));
+		this.shape.push(paper.path(path2).attr(this.pathAttr));
+		this.shape.push(paper.path(path3).attr(this.pathAttr));
 	}
 	removeSelf() {
 		MODEL.pLinks.pop(this);
