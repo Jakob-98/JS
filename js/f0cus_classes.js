@@ -11,8 +11,8 @@ class Model {
 	addProcess (Parent) { //adding a process to the model, called by MOUSE
 		var p = new Process(Parent); 
 		this.processes.push(p); //pushes the created process to the processes of the MODEL
-		p.x = MOUSE.getPosXUp();
-		p.y = MOUSE.getPosYUp();
+		p.x = MOUSE.pageXUp;
+		p.y = MOUSE.pageYUp;
 		p.name = "process: " + (this.processes.indexOf(p) + 1);
 		p.doDraw();
 		console.log("process created on:"+p.x+":"+p.y); 
@@ -21,10 +21,10 @@ class Model {
 		var l = new Link();
 		this.pLinks.push(l);
 		this.activeLink = l;
-		l.x = MOUSE.getPosXDown();
-		l.y = MOUSE.getPosYDown();
-		l.xEnd = MOUSE.getPosXDown();
-		l.yEnd = MOUSE.getPosYDown();
+		l.x = MOUSE.pageXDown
+		l.y = MOUSE.pageYDown;
+		l.xEnd = MOUSE.pageXDown;
+		l.yEnd = MOUSE.pageYDown;
 		l.doDraw();
 	}
 	reDraw() { //redrawing the model, drawing each element of MODEL
@@ -71,8 +71,8 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 			.attr({cursor: 'pointer'}));
 	}
 	onElement (e) { //returns true if element is under cursor, adds element to selection
-		if (Math.abs(MOUSE.getX(e) - this.x) <= 0.5 * RECT_WIDTH &&
-		Math.abs(MOUSE.getY(e) - this.y) <= 0.5 * RECT_HEIGHT) {
+		if (Math.abs(MOUSE.x - this.x) <= 0.5 * RECT_WIDTH &&
+		Math.abs(MOUSE.y- this.y) <= 0.5 * RECT_HEIGHT) {
 			ONELEMENT = true; 
 			return this;
 		} else {
@@ -134,38 +134,48 @@ class Link {
 class MouseManager {
 	constructor(name) {
 		this.name = name;
+		this.x = 0;
+		this.y = 0;
 		this.pageXDown = 0;
 		this.pageYDown = 0;
 		this.pageXUp = 0;
 		this.pageYUp = 0;
+		this.ON_NODE = null;
 	} 
 
-	getPosXDown() {//used to call the current Xposition of mouse 
-		return this.pageXDown - PAPER_OFFSET.left;
-	}
-	getPosYDown() {//used to call the current Yposition of mouse 
-		var offset = $("#svg_paper").offset();
-		return this.pageYDown - PAPER_OFFSET.top;
-	}
-	getPosXUp() {//used to call the current Xposition of mouse 
-		var offset = $("#svg_paper").offset();
-		return this.pageXUp - PAPER_OFFSET.left;
-	}
-	getPosYUp() {//used to call the current Yposition of mouse 
-		var offset = $("#svg_paper").offset();
-		return this.pageYUp - PAPER_OFFSET.top;
-	}
-	getX(e) {
-		var offset = $("#svg_paper").offset();
-		return e.pageX - PAPER_OFFSET.left;
-	}
-	getY(e) {
-		var offset = $("#svg_paper").offset();
-		return e.pageY - PAPER_OFFSET.top;
+	// getPosXDown() {//used to call the current Xposition of mouse 
+	// 	return this.pageXDown - PAPER_OFFSET.left;
+	// }
+	// getPosYDown() {//used to call the current Yposition of mouse 
+	// 	return this.pageYDown - PAPER_OFFSET.top;
+	// }
+	// getPosXUp() {//used to call the current Xposition of mouse 
+	// 	return this.pageXUp - PAPER_OFFSET.left;
+	// }
+	// getPosYUp() {//used to call the current Yposition of mouse 
+	// 	return this.pageYUp - PAPER_OFFSET.top;
+	// }
+
+	mouseMove(e) { 
+		this.x = e.pageX - PAPER_OFFSET.left;
+		this.y = e.pageY - PAPER_OFFSET.top;
+
+		if (LINK_ELEM && MODEL.activeLink) {
+			MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
+			MODEL.activeLink.yEnd = e.pageY - PAPER_OFFSET.top;
+			MODEL.reDraw();
+		}
+		if (!LINK_ELEM){
+			for (var selected of MODEL.selection) {
+				selected.x = e.pageX;// + selected.relativePos.x;
+				selected.y = e.pageY;// + selected.relativePos.y;
+			}
+		}
+		MODEL.reDraw();
 	}
 	mouseDown(e) {
-		this.pageXDown = e.pageX;
-		this.pageYDown = e.pageY;
+		this.pageXDown = e.pageX - PAPER_OFFSET.left;
+		this.pageYDown = e.pageY - PAPER_OFFSET.top;
 
 		
 		if (MODEL.processes.length > 0) {
@@ -186,8 +196,9 @@ class MouseManager {
 		}
 	}
 	mouseUp(e) {
-		this.pageYUp = e.pageY;
-		this.pageXUp = e.pageX;
+		this.pageXUp = e.pageX - PAPER_OFFSET.left;
+		this.pageYUp = e.pageY - PAPER_OFFSET.top;
+
 			if (!ONELEMENT){
 				if (DRAW_RECT) {
 					MODEL.addProcess(A0);
@@ -218,19 +229,5 @@ class MouseManager {
 			MODEL.reDraw();
 	}
 	
-	mouseMove(e) { 
-			if (LINK_ELEM && MODEL.activeLink) {
-				MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
-				MODEL.activeLink.yEnd = e.pageY - PAPER_OFFSET.top;
-				MODEL.reDraw();
-			}
-			if (!LINK_ELEM){
-				for (var selected of MODEL.selection) {
-					selected.x = e.pageX + selected.relativePos.x;
-					selected.y = e.pageY + selected.relativePos.y;
-				}
-			}
-			MODEL.reDraw();
-		}
 	}
 //END CLASS MouseManager
