@@ -106,9 +106,11 @@ class Link {
 			this.x = this.P1.x;
 			this.y = this.P1.y;
 		}
-		var path = ["M", this.x, this.y, "L", 0.5*(this.xEnd+this.x), this.y];
-		var path2 = ["M", 0.5*(this.xEnd+this.x), this.y, "L", 0.5*(this.xEnd+this.x), this.yEnd];
-		var path3 = ["M", 0.5*(this.xEnd+this.x), this.yEnd, "L", this.xEnd, this.yEnd];
+		var pathEl1 = ["M", this.x, this.y, "L", 0.5*(this.xEnd+this.x), this.y];
+		var pathEl2 = ["M", 0.5*(this.xEnd+this.x), this.y, "L", 0.5*(this.xEnd+this.x), this.yEnd];
+		var pathEl3 = ["M", 0.5*(this.xEnd+this.x), this.yEnd, "L", this.xEnd, this.yEnd];
+		
+		var path = ["M", this.x, this.y, "L", this.xEnd, this.yEnd];
 
 		if (this === MODEL.activeLink) {
 			this.pathAttr['opacity'] = 0.5;	
@@ -119,9 +121,13 @@ class Link {
 		}
 		if (this.shape) this.shape.remove();
 		this.shape = paper.set();
-		this.shape.push(paper.path(path).attr(this.pathAttr));
-		this.shape.push(paper.path(path2).attr(this.pathAttr));
-		this.shape.push(paper.path(path3).attr(this.pathAttr));
+		if (!MOUSE.ON_EL && this == MODEL.activeLink){
+			this.shape.push(paper.path(path).attr(this.pathAttr));
+		} else {
+			this.shape.push(paper.path(pathEl1).attr(this.pathAttr));
+			this.shape.push(paper.path(pathEl2).attr(this.pathAttr));
+			this.shape.push(paper.path(pathEl3).attr(this.pathAttr));
+		}
 	}
 	removeSelf() {
 		MODEL.pLinks.pop(this);
@@ -139,17 +145,19 @@ class MouseManager {
 		this.pageYDown = 0;
 		this.pageXUp = 0;
 		this.pageYUp = 0;
-		this.ON_NODE = null;
+		this.ON_EL = null;
+		this.ElDown = null;
+		this.ElUp = null;
 	} 
 	
 	mouseMove(e) { 
 		this.x = e.pageX - PAPER_OFFSET.left;
 		this.y = e.pageY - PAPER_OFFSET.top;
-		this.ON_NODE = null;
+		this.ON_EL = null;
 
 		for (var process of MODEL.processes) {
 			if (process.onElement(e)) { 
-				this.ON_NODE = process;
+				this.ON_EL = process;
 				break; 
 			}
 		}
@@ -167,50 +175,59 @@ class MouseManager {
 		}
 		MODEL.reDraw();
 	}
+
+
 	mouseDown(e) {
 		this.pageXDown = e.pageX - PAPER_OFFSET.left;
 		this.pageYDown = e.pageY - PAPER_OFFSET.top;
+		this.ElDown = null;
 
-			if (SELECT_ELEM) {
-					MODEL.selection.push(this.ON_NODE);
-			}
-
-			for (var selected of MODEL.selection) {
-				selected.relativePos.x = selected.x - this.pageXDown;
-				selected.relativePos.y = selected.y - this.pageYDown;
- 			}
+		if(this.ON_EL) {
+			this.ElDown = this.ON_EL;
+			MODEL.selection.push(this.ON_EL);
+			console.log(MODEL.selection);
+		}
 		
-			if (LINK_ELEM) { 
-				MODEL.addLink();			
-			}
+
+		for (var selected of MODEL.selection) {
+			selected.relativePos.x = selected.x - this.pageXDown;
+			selected.relativePos.y = selected.y - this.pageYDown;
+		}
+	
+		if (LINK_ELEM) { 
+			MODEL.addLink();			
+		}
 	}
+
+
 	mouseUp(e) {
 		this.pageXUp = e.pageX - PAPER_OFFSET.left;
 		this.pageYUp = e.pageY - PAPER_OFFSET.top;
 
-			if (!this.ON_NODE){
+			if (!this.ON_EL){
 				if (DRAW_RECT) {
 					MODEL.addProcess(A0);
 				}
 				MODEL.reDraw();	
-			} 
-			ONELEMENT = false;
+			} else {
+				this.ElDown = this.ON_EL;
+			}
+
 			if (LINK_ELEM) {
 				for (var process of MODEL.processes) {
 					process.onElement(e);
-					if (ONELEMENT) {
+					if (this.ON_EL) {
 						console.log('test');
 						MODEL.selection.push(process);
 						break; //only push one item per selection click
 					}
 				}
-				if (!ONELEMENT) {
+				if (!this.ON_EL) {
 					MODEL.activeLink.removeSelf();
 			}
-				MODEL.activeLink.P1 = MODEL.selection[0];
-				MODEL.activeLink.P2 = MODEL.selection[1];
+				MODEL.activeLink.P1 = this.ElDown;
+				MODEL.activeLink.P2 = this.ElUp;
 			}
-			ONELEMENT = false;
 			MODEL.activeLink = null;
 			if (!SELECT_ELEM) {
 				MODEL.clearSelection();
