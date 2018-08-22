@@ -73,8 +73,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 	onElement (e) { //returns true if element is under cursor, adds element to selection
 		if (Math.abs(MOUSE.x - this.x) <= 0.5 * RECT_WIDTH &&
 		Math.abs(MOUSE.y- this.y) <= 0.5 * RECT_HEIGHT) {
-			ONELEMENT = true; 
-			return this;
+			return true;
 		} else {
 			return;
 		}
@@ -142,23 +141,18 @@ class MouseManager {
 		this.pageYUp = 0;
 		this.ON_NODE = null;
 	} 
-
-	// getPosXDown() {//used to call the current Xposition of mouse 
-	// 	return this.pageXDown - PAPER_OFFSET.left;
-	// }
-	// getPosYDown() {//used to call the current Yposition of mouse 
-	// 	return this.pageYDown - PAPER_OFFSET.top;
-	// }
-	// getPosXUp() {//used to call the current Xposition of mouse 
-	// 	return this.pageXUp - PAPER_OFFSET.left;
-	// }
-	// getPosYUp() {//used to call the current Yposition of mouse 
-	// 	return this.pageYUp - PAPER_OFFSET.top;
-	// }
-
+	
 	mouseMove(e) { 
 		this.x = e.pageX - PAPER_OFFSET.left;
 		this.y = e.pageY - PAPER_OFFSET.top;
+		this.ON_NODE = null;
+
+		for (var process of MODEL.processes) {
+			if (process.onElement(e)) { 
+				this.ON_NODE = process;
+				break; 
+			}
+		}
 
 		if (LINK_ELEM && MODEL.activeLink) {
 			MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
@@ -167,8 +161,8 @@ class MouseManager {
 		}
 		if (!LINK_ELEM){
 			for (var selected of MODEL.selection) {
-				selected.x = e.pageX;// + selected.relativePos.x;
-				selected.y = e.pageY;// + selected.relativePos.y;
+				selected.x = this.x + selected.relativePos.x;
+				selected.y = this.y + selected.relativePos.y;
 			}
 		}
 		MODEL.reDraw();
@@ -177,29 +171,24 @@ class MouseManager {
 		this.pageXDown = e.pageX - PAPER_OFFSET.left;
 		this.pageYDown = e.pageY - PAPER_OFFSET.top;
 
-		
-		if (MODEL.processes.length > 0) {
-			for (var process of MODEL.processes) {
-				process.onElement(e);
-				if (ONELEMENT) {
-					MODEL.selection.push(process);
-					break; //only push one item per selection click
-				}
+			if (SELECT_ELEM) {
+					MODEL.selection.push(this.ON_NODE);
 			}
+
 			for (var selected of MODEL.selection) {
 				selected.relativePos.x = selected.x - this.pageXDown;
 				selected.relativePos.y = selected.y - this.pageYDown;
  			}
-		}
-		if (LINK_ELEM) { 
-			MODEL.addLink();			
-		}
+		
+			if (LINK_ELEM) { 
+				MODEL.addLink();			
+			}
 	}
 	mouseUp(e) {
 		this.pageXUp = e.pageX - PAPER_OFFSET.left;
 		this.pageYUp = e.pageY - PAPER_OFFSET.top;
 
-			if (!ONELEMENT){
+			if (!this.ON_NODE){
 				if (DRAW_RECT) {
 					MODEL.addProcess(A0);
 				}
