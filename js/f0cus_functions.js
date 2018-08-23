@@ -6,16 +6,16 @@ function btnClick(e) {
     switch (e.currentTarget.id) {
         case 'rectbutton':
             setState(e.currentTarget.id, true);
-            e.currentTarget.style.background ='grey'
+            e.currentTarget.style.background ='white'
             DRAW_RECT = true;
             break;
         case 'selectbutton':
             setState(e.currentTarget.id, true);
-            e.currentTarget.style.background ='grey'
+            e.currentTarget.style.background ='white'
             SELECT_ELEM = true;
         case 'linkbutton':
             setState(e.currentTarget.id, true);
-            e.currentTarget.style.background ='grey'
+            e.currentTarget.style.background ='white'
             LINK_ELEM = true;
             break;
         
@@ -26,7 +26,7 @@ function btnClick(e) {
 
 function resetStateAll() {
     $('.btn').each(function () { 
-        this.style.background = "black";
+        this.style.background = "grey";
     });
     setState('clearbutton', false);
     setState('unbindbutton', false);

@@ -55,9 +55,9 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 	}
 	doDraw() { //draw itself
 		if (MODEL.selection.includes(this)) { //changes color when selected
-			this.fillColor = '#A9A9A9';
-		} else {
 			this.fillColor = '#DCDCDC';
+		} else {
+			this.fillColor = 'White';
 		}
 		this.calcStepNr(); //calculate the step number
 		if (this.shape) this.shape.remove();
@@ -65,6 +65,38 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 		this.shape.push(paper.rect(this.x - 1/2 * RECT_WIDTH, 
 			this.y - 1/2 * RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)
 			.attr({cursor: 'pointer', fill: this.fillColor}));
+
+
+		var path = [
+			"M", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+		 	"L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
+		 	"L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
+			"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+			"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
+		] //testing the selection area's
+
+		var path2 = [
+			"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+		 	"L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
+		 	"L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
+			"L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+			"L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
+		] 
+		var path3 = [
+			"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+		 	"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT
+		] 
+		var path4 = [
+			"M", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT, 
+		 	"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT
+		] 
+		this.shape.push(paper.path(path).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
+		this.shape.push(paper.path(path2).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
+		this.shape.push(paper.path(path3).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
+		this.shape.push(paper.path(path4).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
+
+
+		
 		this.shape.push(paper.text(this.x, this.y, this.name)
 			.attr({cursor: 'pointer'}));
 		this.shape.push(paper.text(this.x + 3/9 * RECT_WIDTH, this.y + 3/9 * RECT_HEIGHT,'A' + this.stepNr) //TODO add parent "number" -> parent is A1, add 1 to A number 
@@ -94,18 +126,10 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 class Link {
 	constructor() {
 		this.shape = null;
-		this.pathAttr = {
-			'arrow-end':   'classic-wide-long',
-			'opacity' : 1
-		}
+		this.pathAttr = {'opacity' : 1}
 	}
 	doDraw() {
-		if (this.P1 && this.P2) {
-			this.xEnd = this.P2.x;
-			this.yEnd = this.P2.y;			
-			this.x = this.P1.x;
-			this.y = this.P1.y;
-		}
+		this.detVals();
 		var pathEl1 = ["M", this.x, this.y, "L", 0.5*(this.xEnd+this.x), this.y];
 		var pathEl2 = ["M", 0.5*(this.xEnd+this.x), this.y, "L", 0.5*(this.xEnd+this.x), this.yEnd];
 		var pathEl3 = ["M", 0.5*(this.xEnd+this.x), this.yEnd, "L", this.xEnd, this.yEnd];
@@ -121,16 +145,34 @@ class Link {
 		}
 		if (this.shape) this.shape.remove();
 		this.shape = paper.set();
+		
 		if (!MOUSE.ON_EL && this == MODEL.activeLink){
 			this.shape.push(paper.path(path).attr(this.pathAttr));
 		} else {
 			this.shape.push(paper.path(pathEl1).attr(this.pathAttr));
 			this.shape.push(paper.path(pathEl2).attr(this.pathAttr));
-			this.shape.push(paper.path(pathEl3).attr(this.pathAttr));
+			this.shape.push(paper.path(pathEl3).attr(this.pathAttr)); //TODO add 'arrow-end':   'classic-wide-long'. 
 		}
 	}
 	removeSelf() {
 		MODEL.pLinks.pop(this);
+	}
+	detVals() {//TODO add check if p1 = p2, change the path etc..
+		if (this !== MODEL.activeLink) { //if P1 or P2 is not defined, remove itself. 
+			if (!this.P1 || !this.P2) { //TODO add a check if there is already such a link
+				this.removeSelf();
+			}
+		}
+		if (this.P1 === this.P2) { //TO DO add functionality if P1 = P2. 
+
+		} else { 
+			if (this.P1 && this.P2) {
+				this.xEnd = this.P2.x - 1/2 * RECT_WIDTH - 1.5;
+				this.yEnd = this.P2.y;			
+				this.x = this.P1.x + 1/2 * RECT_WIDTH;
+				this.y = this.P1.y;
+			}
+		}
 	}
 }
 //END CLASS Link
@@ -146,8 +188,6 @@ class MouseManager {
 		this.pageXUp = 0;
 		this.pageYUp = 0;
 		this.ON_EL = null;
-		this.ElDown = null;
-		this.ElUp = null;
 	} 
 	
 	mouseMove(e) { 
@@ -165,7 +205,6 @@ class MouseManager {
 		if (LINK_ELEM && MODEL.activeLink) {
 			MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
 			MODEL.activeLink.yEnd = e.pageY - PAPER_OFFSET.top;
-			MODEL.reDraw();
 		}
 		if (!LINK_ELEM){
 			for (var selected of MODEL.selection) {
@@ -180,12 +219,9 @@ class MouseManager {
 	mouseDown(e) {
 		this.pageXDown = e.pageX - PAPER_OFFSET.left;
 		this.pageYDown = e.pageY - PAPER_OFFSET.top;
-		this.ElDown = null;
 
 		if(this.ON_EL) {
-			this.ElDown = this.ON_EL;
 			MODEL.selection.push(this.ON_EL);
-			console.log(MODEL.selection);
 		}
 		
 
@@ -195,7 +231,8 @@ class MouseManager {
 		}
 	
 		if (LINK_ELEM) { 
-			MODEL.addLink();			
+			MODEL.addLink();
+			MODEL.activeLink.P1 = this.ON_EL;		
 		}
 	}
 
@@ -208,26 +245,24 @@ class MouseManager {
 				if (DRAW_RECT) {
 					MODEL.addProcess(A0);
 				}
-				MODEL.reDraw();	
-			} else {
-				this.ElDown = this.ON_EL;
 			}
 
 			if (LINK_ELEM) {
 				for (var process of MODEL.processes) {
 					process.onElement(e);
 					if (this.ON_EL) {
-						console.log('test');
 						MODEL.selection.push(process);
 						break; //only push one item per selection click
 					}
 				}
 				if (!this.ON_EL) {
 					MODEL.activeLink.removeSelf();
+				} else {
+					MODEL.activeLink.P2 = this.ON_EL;
+				}
+				resetStateAll();
 			}
-				MODEL.activeLink.P1 = this.ElDown;
-				MODEL.activeLink.P2 = this.ElUp;
-			}
+
 			MODEL.activeLink = null;
 			if (!SELECT_ELEM) {
 				MODEL.clearSelection();
