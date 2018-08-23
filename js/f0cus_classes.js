@@ -196,19 +196,19 @@ class MouseManager {
 		this.ON_EL = null;
 
 		for (var process of MODEL.processes) {
-			if (process.onElement(e)) { 
+			if (process.onElement(e)) {  //is there an object under the cursor?
 				this.ON_EL = process;
 				break; 
 			}
 		}
 
 		if (LINK_ELEM && MODEL.activeLink) {
-			MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left;
+			MODEL.activeLink.xEnd = e.pageX - PAPER_OFFSET.left; //when the link is being dragged (active) the end is just the values of your mouse pointer
 			MODEL.activeLink.yEnd = e.pageY - PAPER_OFFSET.top;
 		}
 		if (!LINK_ELEM){
 			for (var selected of MODEL.selection) {
-				selected.x = this.x + selected.relativePos.x;
+				selected.x = this.x + selected.relativePos.x; //enables dragging of multiple objects at the same time
 				selected.y = this.y + selected.relativePos.y;
 			}
 		}
@@ -220,13 +220,13 @@ class MouseManager {
 		this.pageXDown = e.pageX - PAPER_OFFSET.left;
 		this.pageYDown = e.pageY - PAPER_OFFSET.top;
 
-		if(this.ON_EL) {
+		if(this.ON_EL) { //if there is an object under the cursor, it gets added to the model selection. 
 			MODEL.selection.push(this.ON_EL);
 		}
 		
 
 		for (var selected of MODEL.selection) {
-			selected.relativePos.x = selected.x - this.pageXDown;
+			selected.relativePos.x = selected.x - this.pageXDown; //determine the relative position to the clicked object to allow dragging of multiple objects. 
 			selected.relativePos.y = selected.y - this.pageYDown;
 		}
 	
@@ -248,19 +248,21 @@ class MouseManager {
 			}
 
 			if (LINK_ELEM) {
-				for (var process of MODEL.processes) {
-					process.onElement(e);
-					if (this.ON_EL) {
-						MODEL.selection.push(process);
-						break; //only push one item per selection click
-					}
-				}
-				if (!this.ON_EL) {
-					MODEL.activeLink.removeSelf();
-				} else {
+
+				//// So I had to use this code when I still had multiple selection of objects enabled, but now I don't need to use it at this point it time, but I dont want to remove it yet. 
+				// for (var process of MODEL.processes) { 
+				// 	process.onElement(e);
+				// 	if (this.ON_EL) {
+				// 		MODEL.selection.push(process);
+				// 		break;  //only push one item per selection click
+				// 	}
+				// }
+
+
+				if (this.ON_EL) {
 					MODEL.activeLink.P2 = this.ON_EL;
 				}
-				resetStateAll();
+				resetStateAll(); //I currently don't want users to create multiple links after eachother just by spam clicking before I fix some issues with the links, so I disable the link button after use
 			}
 
 			MODEL.activeLink = null;
