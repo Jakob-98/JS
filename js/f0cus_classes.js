@@ -26,6 +26,9 @@ class Model {
 		l.xEnd = MOUSE.pageXDown;
 		l.yEnd = MOUSE.pageYDown;
 		l.doDraw();
+		if (MOUSE.ON_EL) {
+			MOUSE.ON_EL.linksOut.push(l);
+		}
 	}
 	reDraw() { //redrawing the model, drawing each element of MODEL
 		paper.clear();
@@ -52,6 +55,9 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 		this.fillColor = '#DCDCDC';
 		this.stepNr = 0;
 		this.relativePos = {x : 0, y : 0};
+		this.selectDragArea = "";
+		this.dragAreaPath = [];
+		this.linksOut = [];
 	}
 	doDraw() { //draw itself
 		if (MODEL.selection.includes(this)) { //changes color when selected
@@ -66,37 +72,61 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 			this.y - 1/2 * RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)
 			.attr({cursor: 'pointer', fill: this.fillColor}));
 
+		if (MOUSE.ON_EL !== this || !LINK_ELEM) {
+			this.selectDragArea = "";
+		}
 
-		var path = [
-			"M", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-		 	"L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
-		 	"L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
-			"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-			"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
-		] //testing the selection area's
-
-		var path2 = [
-			"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-		 	"L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
-		 	"L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
-			"L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-			"L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
-		] 
-		var path3 = [
-			"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-		 	"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT
-		] 
-		var path4 = [
-			"M", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT, 
-		 	"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT
-		] 
-		this.shape.push(paper.path(path).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
-		this.shape.push(paper.path(path2).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
-		this.shape.push(paper.path(path3).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
-		this.shape.push(paper.path(path4).attr({'opacity' : 0.7, 'stroke-dasharray' : "--"}));
-
-
+		switch (this.selectDragArea) {
+			case 'C':
+				this.dragAreaPath = [
+					"M", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT, 
+					"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+					"L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT,
+					"L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT,	
+					"L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+				]; 
+				break;			
+			case 'I':
+				this.dragAreaPath = [
+					"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+					"L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
+					"L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
+					"L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+					"L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
+				]; 
+				break;
+			case 'M':
+				this.dragAreaPath =[
+					"M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+					"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT,
+					"L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
+					"L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,	
+					"L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT,
+				];
+				
+				break;
+			case 'O':
+				this.dragAreaPath = [
+					"M", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
+					"L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
+					"L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
+					"L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
+					"L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
+				];
+				break;
 		
+			default:
+				this.dragAreaPath = "";
+				break;
+		}
+
+		this.shape.push(paper.path(this.dragAreaPath)
+			.attr({
+				'opacity' : 1,
+				'fill' : 'lightblue',
+			 	'fill-opacity' : 0.3,
+				'cursor': 'pointer'
+			}));	
 		this.shape.push(paper.text(this.x, this.y, this.name)
 			.attr({cursor: 'pointer'}));
 		this.shape.push(paper.text(this.x + 3/9 * RECT_WIDTH, this.y + 3/9 * RECT_HEIGHT,'A' + this.stepNr) //TODO add parent "number" -> parent is A1, add 1 to A number 
@@ -119,6 +149,20 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 		}
 		this.stepNr = nr;
 	}
+	detDragArea(){//determines in what area youre dragging the link, then sets the value of the selectDragArea
+		if ((MOUSE.y - this.y) - (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) >= 0 ) {
+			this.selectDragArea = "C";
+		} 
+		if ((MOUSE.y - this.y) - (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) <= 0 ) {
+			this.selectDragArea = "M";
+		} 
+		if ((MOUSE.y - this.y) + (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) >= 0 ) {
+			this.selectDragArea = "I";
+		} 
+		if ((MOUSE.y - this.y) + (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) <= 0 ) {
+			this.selectDragArea = "O";
+		}
+	}
 }
 //END CLASS Process
 
@@ -126,53 +170,130 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
 class Link {
 	constructor() {
 		this.shape = null;
-		this.pathAttr = {'opacity' : 1}
+		this.pathAttr = {
+			'opacity' : 1,
+			'arrow-end':   'classic-wide-long'
+		}
+		this.type = ""; //type is either "I" for input, "C" for control, "M" for 
+		this.path = [];
 	}
 	doDraw() {
-		this.detVals();
-		var pathEl1 = ["M", this.x, this.y, "L", 0.5*(this.xEnd+this.x), this.y];
-		var pathEl2 = ["M", 0.5*(this.xEnd+this.x), this.y, "L", 0.5*(this.xEnd+this.x), this.yEnd];
-		var pathEl3 = ["M", 0.5*(this.xEnd+this.x), this.yEnd, "L", this.xEnd, this.yEnd];
+		this.detVals();//determine the x and y values based on where it is dragged on.
+		this.detPath();//determine the path of the link
 		
-		var path = ["M", this.x, this.y, "L", this.xEnd, this.yEnd];
+		if (this.shape) this.shape.remove();
+		this.shape = paper.set();
+		this.shape.push(paper.path(this.path).attr(this.pathAttr));
+		
+	}
+	removeSelf() { 
+		if (this.P1) {
+			this.P1.linksOut.pop(this);
+		}
+		MODEL.pLinks.pop(this);
+	}
 
-		if (this === MODEL.activeLink) {
+	detVals() {//TODO add check if p1 = p2, change the path etc..
+		if (this !== MODEL.activeLink) { //if P1 or P2 is not defined, remove itself. 
+			if (!this.P1 || !this.P2) { //TODO add a check if there is already such a link, then either delete self or add another link with space between Y values...
+				this.removeSelf();
+			}
+		}
+		if (this.P1 === this.P2 && this !== MODEL.activeLink) { //TO DO add functionality if P1 = P2. 
+			this.removeSelf();
+		} else { 
+			if (this.P1 && this.P2) {
+				switch (this.type) {
+					case 'I':
+						this.xEnd = this.P2.x - 1/2 * RECT_WIDTH - 1.5;
+						this.yEnd = this.P2.y;			
+						this.x = this.P1.x + 1/2 * RECT_WIDTH;
+						this.y = this.P1.y;
+						break;
+					case 'C':
+						this.xEnd = this.P2.x;
+						this.yEnd = this.P2.y - 1/2 * RECT_HEIGHT - 1.5;			
+						this.x = this.P1.x + 1/2 * RECT_WIDTH;
+						this.y = this.P1.y;
+						break;					
+					case 'M':
+						this.xEnd = this.P2.x;
+						this.yEnd = this.P2.y + 1/2 * RECT_HEIGHT + 1.5;			
+						this.x = this.P1.x + 1/2 * RECT_WIDTH;
+						this.y = this.P1.y;
+						break;
+					default:
+						this.removeSelf();
+						break;
+				}
+
+			} 
+		}
+	}
+	detPath() {
+		//path attributes
+		var posOffset = 0;
+		if (this === MODEL.activeLink) { //if this is the actively draggable link, change opacity etc
 			this.pathAttr['opacity'] = 0.5;	
 			this.pathAttr['stroke-dasharray'] = "--";	
 		} else {
 			this.pathAttr['opacity'] = 1;	
 			this.pathAttr['stroke-dasharray'] = undefined;	
+			posOffset = (this.P1.linksOut.indexOf(this) + 1) / (this.P1.linksOut.length + 1);
 		}
-		if (this.shape) this.shape.remove();
-		this.shape = paper.set();
+		//paths
+			switch (this.type) {
+				case "I":
+					this.path = [
+						"M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+						"L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+						"L", 0.5*(this.xEnd+this.x), this.yEnd, 
+						"L", this.xEnd, this.yEnd
+					];
+					break;
+				case "C":
+						if (this.P1.y > this.P2.y - 1/2 * RECT_HEIGHT) {
+							this.path = [
+								"M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+								"L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+								"L", 0.5*(this.xEnd+this.x), this.yEnd - 0.5 * RECT_HEIGHT, 
+								"L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
+								"L", this.xEnd, this.yEnd
+							];
+						} else {
+							this.path = [
+								"M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+								"L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+								"L", this.xEnd, this.yEnd
+							]
+						}
+					break;
+				case "M":
+					if (this.P1.y < this.P2.y + 1/2 * RECT_HEIGHT) {
+						this.path = [
+							"M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+							"L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+							"L", 0.5*(this.xEnd+this.x), this.yEnd + 0.5 * RECT_HEIGHT, 
+							"L", this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT,
+							"L", this.xEnd, this.yEnd
+						];
+					} else {
+						this.path = [
+							"M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+							"L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+							"L", this.xEnd, this.yEnd
+						]
+					}
+					break;
+			
+				default:
+					this.path = [
+						"M", this.x, this.y, 
+						"L", this.xEnd, this.yEnd
+					];
+					break;
+			}
 		
-		if (!MOUSE.ON_EL && this == MODEL.activeLink){
-			this.shape.push(paper.path(path).attr(this.pathAttr));
-		} else {
-			this.shape.push(paper.path(pathEl1).attr(this.pathAttr));
-			this.shape.push(paper.path(pathEl2).attr(this.pathAttr));
-			this.shape.push(paper.path(pathEl3).attr(this.pathAttr)); //TODO add 'arrow-end':   'classic-wide-long'. 
-		}
-	}
-	removeSelf() {
-		MODEL.pLinks.pop(this);
-	}
-	detVals() {//TODO add check if p1 = p2, change the path etc..
-		if (this !== MODEL.activeLink) { //if P1 or P2 is not defined, remove itself. 
-			if (!this.P1 || !this.P2) { //TODO add a check if there is already such a link
-				this.removeSelf();
-			}
-		}
-		if (this.P1 === this.P2) { //TO DO add functionality if P1 = P2. 
-
-		} else { 
-			if (this.P1 && this.P2) {
-				this.xEnd = this.P2.x - 1/2 * RECT_WIDTH - 1.5;
-				this.yEnd = this.P2.y;			
-				this.x = this.P1.x + 1/2 * RECT_WIDTH;
-				this.y = this.P1.y;
-			}
-		}
 	}
 }
 //END CLASS Link
@@ -198,6 +319,9 @@ class MouseManager {
 		for (var process of MODEL.processes) {
 			if (process.onElement(e)) {  //is there an object under the cursor?
 				this.ON_EL = process;
+				if (LINK_ELEM) {
+					this.ON_EL.detDragArea();
+				}
 				break; 
 			}
 		}
@@ -232,7 +356,9 @@ class MouseManager {
 	
 		if (LINK_ELEM) { 
 			MODEL.addLink();
-			MODEL.activeLink.P1 = this.ON_EL;		
+			if (this.ON_EL) {
+				MODEL.activeLink.P1 = this.ON_EL;		
+			}
 		}
 	}
 
@@ -261,6 +387,11 @@ class MouseManager {
 
 				if (this.ON_EL) {
 					MODEL.activeLink.P2 = this.ON_EL;
+					MODEL.activeLink.type = this.ON_EL.selectDragArea;
+					if (MODEL.activeLink.P1.linksOut.length > 3) {
+						MODEL.activeLink.removeSelf();
+						console.log("too many links out")
+					} 
 				}
 				resetStateAll(); //I currently don't want users to create multiple links after eachother just by spam clicking before I fix some issues with the links, so I disable the link button after use
 			}
@@ -270,7 +401,6 @@ class MouseManager {
 				MODEL.clearSelection();
 			} 
 			MODEL.reDraw();
-	}
-	
+		}
 	}
 //END CLASS MouseManager
