@@ -7,13 +7,15 @@ class Model {
     this.pLinks = [];
     this.selection = [];
     this.activeLink = null;
+    this.parentLevel = "A0";
   }
   addProcess (Parent) { //adding a process to the model, called by MOUSE
     var p = new Process(Parent); 
     this.processes.push(p); //pushes the created process to the processes of the MODEL
-	p.x = MOUSE.pageXUp;
-	p.y = MOUSE.pageYUp;
+	  p.x = MOUSE.pageXUp;
+	  p.y = MOUSE.pageYUp;
     p.name = "process: " + (this.processes.indexOf(p) + 1);
+    p.parent.subProcesses.push(p);
     p.doDraw();
     console.log("process created on:"+p.x+":"+p.y); 
   }
@@ -72,11 +74,57 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
       this.y - 1/2 * RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)
       .attr({cursor: 'pointer', fill: this.fillColor}));
 
+    this.detDragPath();
+
+    this.shape.push(paper.path(this.dragAreaPath)
+      .attr({
+        'opacity' : 1,
+        'fill' : 'lightblue',
+         'fill-opacity' : 0.3,
+        'cursor': 'pointer'
+      }));	
+    this.shape.push(paper.text(this.x, this.y, this.name)
+      .attr({cursor: 'pointer'}));
+    this.shape.push(paper.text(this.x + 3/9 * RECT_WIDTH, this.y + 3/9 * RECT_HEIGHT,'A' + this.stepNr) //TODO add parent "number" -> parent is A1, add 1 to A number 
+      .attr({cursor: 'pointer'}));
+  }
+  onElement (e) { //returns true if element is under cursor, adds element to selection
+    if (Math.abs(MOUSE.x - this.x) <= 0.5 * RECT_WIDTH &&
+    Math.abs(MOUSE.y- this.y) <= 0.5 * RECT_HEIGHT) {
+      return true;
+    } else {
+      return;
+    }
+  }
+  calcStepNr() { //calculate which step this is
+    var nr = 1;
+    for (var process of MODEL.processes) { //TODO sort processes and links  by x value
+      if (process.x < this.x) {
+        nr += 1;
+      }
+    }
+    this.stepNr = nr;
+  }
+  detDragArea() {//determines in what area youre dragging the link, then sets the value of the selectDragArea
+    if ((MOUSE.y - this.y) - (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) >= 0 ) {
+      this.selectDragArea = "C";
+    } 
+    if ((MOUSE.y - this.y) - (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) <= 0 ) {
+      this.selectDragArea = "M";
+    } 
+    if ((MOUSE.y - this.y) + (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) >= 0 ) {
+      this.selectDragArea = "I";
+    } 
+    if ((MOUSE.y - this.y) + (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) <= 0 ) {
+      this.selectDragArea = "O";
+    }
+  }
+  detDragPath() {
     if (MOUSE.ON_EL !== this || !LINK_ELEM) {
       this.selectDragArea = "";
     }
 
-    switch (this.selectDragArea) {
+    switch (this.selectDragArea) { //TODO deze weghalen relatief maken en bij onload zetten. 
       case 'C':
         this.dragAreaPath = [
           "M", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT, 
@@ -119,49 +167,13 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
         this.dragAreaPath = "";
         break;
     }
-
-    this.shape.push(paper.path(this.dragAreaPath)
-      .attr({
-        'opacity' : 1,
-        'fill' : 'lightblue',
-         'fill-opacity' : 0.3,
-        'cursor': 'pointer'
-      }));	
-    this.shape.push(paper.text(this.x, this.y, this.name)
-      .attr({cursor: 'pointer'}));
-    this.shape.push(paper.text(this.x + 3/9 * RECT_WIDTH, this.y + 3/9 * RECT_HEIGHT,'A' + this.stepNr) //TODO add parent "number" -> parent is A1, add 1 to A number 
-      .attr({cursor: 'pointer'}));
   }
-  onElement (e) { //returns true if element is under cursor, adds element to selection
-    if (Math.abs(MOUSE.x - this.x) <= 0.5 * RECT_WIDTH &&
-    Math.abs(MOUSE.y- this.y) <= 0.5 * RECT_HEIGHT) {
-      return true;
-    } else {
-      return;
+  removeSelf() {
+    if(this.parent) {
+      this.parent.subProcesses.pop;
     }
-  }
-  calcStepNr() { //calculate which step this is
-    var nr = 1;
-    for (var process of MODEL.processes) {
-      if (process.x < this.x) {
-        nr += 1;
-      }
-    }
-    this.stepNr = nr;
-  }
-  detDragArea(){//determines in what area youre dragging the link, then sets the value of the selectDragArea
-    if ((MOUSE.y - this.y) - (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) >= 0 ) {
-      this.selectDragArea = "C";
-    } 
-    if ((MOUSE.y - this.y) - (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) - (MOUSE.y - this.y) <= 0 ) {
-      this.selectDragArea = "M";
-    } 
-    if ((MOUSE.y - this.y) + (MOUSE.x - this.x) <= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) >= 0 ) {
-      this.selectDragArea = "I";
-    } 
-    if ((MOUSE.y - this.y) + (MOUSE.x - this.x) >= 0 && - (MOUSE.x - this.x) + (MOUSE.y - this.y) <= 0 ) {
-      this.selectDragArea = "O";
-    }
+    MODEL.processes.pop(this);
+    MODEL.redraw();
   }
 }
 //END CLASS Process
