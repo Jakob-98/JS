@@ -3,7 +3,7 @@
 //CLASS Model
 class Model {
   constructor() {
-    this.processes = [];
+    this.processes = []; //processes of the model sorted by x value
     this.pLinks = [];
     this.selection = [];
     this.activeLink = null;
@@ -33,6 +33,7 @@ class Model {
     }
   }
   reDraw() { //redrawing the model, drawing each element of MODEL
+    this.sortArrays();
     paper.clear();
     for (var procces of this.processes) {
       procces.doDraw();
@@ -43,6 +44,10 @@ class Model {
   }
   clearSelection () { //clear the selection
     this.selection = [];
+  }
+  sortArrays(){ 
+    this.processes.sort(this.x);//sort the processes by x value
+    this.pLinks.sort(this.yEnd);//sort the links by their y end value
   }
 }
 //END CLASS Model
@@ -60,6 +65,9 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     this.selectDragArea = "";
     this.dragAreaPath = [];
     this.linksOut = [];
+    this.linksInI = [];
+    this.linksInC = [];
+    this.linksInM = [];
   }
   doDraw() { //draw itself
     if (MODEL.selection.includes(this)) { //changes color when selected
@@ -175,6 +183,17 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     MODEL.processes.pop(this);
     MODEL.redraw();
   }
+  linkSorter() {
+    this.linksOut.sort(function(a, b) {
+      return parseInt(a.yEnd) - parseFloat(b.yEnd);
+  });
+  this.linksInC.sort(function(a, b) {
+    return parseInt(a.xEnd) - parseFloat(b.xEnd);
+  });    
+  this.linksInM.sort(function(a, b) {
+    return parseInt(a.xEnd) - parseFloat(b.xEnd);
+  });
+ }
 }
 //END CLASS Process
 
@@ -198,9 +217,25 @@ class Link {
     this.shape.push(paper.path(this.path).attr(this.pathAttr));
     
   }
-  removeSelf() { 
+  removeSelf() { //removes itself from different arrays then finally popping of the MODEL stack.
     if (this.P1) {
       this.P1.linksOut.pop(this);
+    }
+    if (this.P2) { 
+      switch (this.type) {
+        case "I":
+        this.P2.linksInI.pop(this);
+          break;
+        case "C":
+        this.P2.linksInC.pop(this);
+          break;
+        case "M":
+        this.P2.linksInM.pop(this);
+          break;
+      
+        default:
+          break;
+      }
     }
     MODEL.pLinks.pop(this);
   }
@@ -244,38 +279,41 @@ class Link {
   }
   detPath() {
     //path attributes
-    var posOffset = 0;
+    var posYOffset = 0;
+    var posXOffset = 0;
     if (this === MODEL.activeLink) { //if this is the actively draggable link, change opacity etc
       this.pathAttr['opacity'] = 0.5;	
       this.pathAttr['stroke-dasharray'] = "--";	
     } else {
       this.pathAttr['opacity'] = 1;	
-      this.pathAttr['stroke-dasharray'] = undefined;	
-      posOffset = (this.P1.linksOut.indexOf(this) + 1) / (this.P1.linksOut.length + 1);
+      this.pathAttr['stroke-dasharray'] = undefined;
+      this.P1.linkSorter();
+      posYOffset = (this.P1.linksOut.indexOf(this) + 1) / (this.P1.linksOut.length + 1);
     }
     //paths
       switch (this.type) {
         case "I":
           this.path = [
-            "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-            "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-            "L", 0.5*(this.xEnd+this.x), this.yEnd, 
-            "L", this.xEnd, this.yEnd
+            "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+            "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+            "L", 0.5*(this.xEnd+this.x), this.yEnd- 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+            "L", this.xEnd, this.yEnd - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT)
           ];
           break;
-        case "C":
+        case "C": //TODO add the posYoffset to the if statement so the link wont go "inside" the process. TODO fix the links.
+            posXOffset = (this.P1.linksInC.indexOf(this) + 1) / (this.P1.linksInC.length + 1);
             if (this.P1.y > this.P2.y - 1/2 * RECT_HEIGHT) {
               this.path = [
-                "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-                "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+                "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+                "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
                 "L", 0.5*(this.xEnd+this.x), this.yEnd - 0.5 * RECT_HEIGHT, 
-                "L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
-                "L", this.xEnd, this.yEnd
+                "L", this.xEnd - 0.4 * RECT_HEIGHT + (2 * posXOffset * 0.4 * RECT_WIDTH), this.yEnd - 0.5 * RECT_HEIGHT,
+                "L", this.xEnd - 0.4 * RECT_HEIGHT + (2 * posXOffset * 0.4 * RECT_WIDTH), this.yEnd
               ];
             } else {
               this.path = [
-                "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-                "L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+                "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+                "L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
                 "L", this.xEnd, this.yEnd
               ]
             }
@@ -283,16 +321,16 @@ class Link {
         case "M":
           if (this.P1.y < this.P2.y + 1/2 * RECT_HEIGHT) {
             this.path = [
-              "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-              "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+              "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+              "L", 0.5*(this.xEnd+this.x), this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
               "L", 0.5*(this.xEnd+this.x), this.yEnd + 0.5 * RECT_HEIGHT, 
               "L", this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT,
               "L", this.xEnd, this.yEnd
             ];
           } else {
             this.path = [
-              "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
-              "L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posOffset * 0.4 * RECT_HEIGHT), 
+              "M", this.x, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
+              "L", this.xEnd, this.y - 0.4 * RECT_HEIGHT + (2 * posYOffset * 0.4 * RECT_HEIGHT), 
               "L", this.xEnd, this.yEnd
             ]
           }
@@ -305,7 +343,22 @@ class Link {
           ];
           break;
       }
+  }
+  addLinkIn() { //not LinkedIn // adds the link to the linkIn of the p2 process to be used for determining position of xEnd/yEnd
+    switch (this.type) {
+      case "I":
+        this.P2.linksInI.push(this);
+        break;
+      case "C":
+        this.P2.linksInC.push(this);
+        break;
+      case "M":
+        this.P2.linksInM.push(this);
+        break;
     
+      default:
+        break;
+    }
   }
 }
 //END CLASS Link
@@ -400,7 +453,8 @@ class MouseManager {
         if (this.ON_EL) {
           MODEL.activeLink.P2 = this.ON_EL;
           MODEL.activeLink.type = this.ON_EL.selectDragArea;
-          if (MODEL.activeLink.P1.linksOut.length > 3) {
+          MODEL.activeLink.addLinkIn(); //adds the linkIn for the P2 process.
+          if (MODEL.activeLink.P1.linksOut.length > 5) {
             MODEL.activeLink.removeSelf();
             console.log("too many links out")
           } 
