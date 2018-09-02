@@ -227,16 +227,16 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
   }
   linkSorter() {
   this.linksOut.sort(function(a, b) {
-      return parseInt(a.yEnd) - parseFloat(b.yEnd);
+      return parseInt(a.yEnd) - parseInt(b.yEnd);
   });
   this.linksInI.sort(function(a, b) {
-    return parseInt(a.yEnd) - parseFloat(b.yEnd);
+    return parseInt(a.yEnd) - parseInt(b.yEnd);
 });
   this.linksInC.sort(function(a, b) {
-    return parseInt(a.xEnd) - parseFloat(b.xEnd);
+    return parseInt(a.y) + parseInt(b.y);
   });    
   this.linksInM.sort(function(a, b) {
-    return parseInt(a.xEnd) - parseFloat(b.xEnd);
+    return parseInt(a.y) - parseInt(b.y);
   });
 
   this.linksInYUp = [];
@@ -270,6 +270,7 @@ class Link {
     }
     this.type = ""; //type is either "I" for input, "C" for control, "M" for 
     this.path = [];
+    this.middlePoint = 0;
   }
   doDraw() {
     this.detVals();//determine the x and y values based on where it is dragged on.
@@ -305,15 +306,23 @@ class Link {
   }
 
   detVals() {//TODO add check if p1 = p2, change the path etc..
+    var xOffsetMult = 0;
+    var posXOffset = 0;
+
+
+
     if (this !== MODEL.activeLink) { //if P1 or P2 is not defined, remove itself. 
       if (!this.P1 || !this.P2) { //TODO add a check if there is already such a link, then either delete self or add another link with space between Y values...
         this.removeSelf();
       }
     }
+
+
     if (this.P1 === this.P2 && this !== MODEL.activeLink) { //TO DO add functionality if P1 = P2. 
       this.removeSelf();
     } else { 
       if (this.P1 && this.P2) {
+        this.middlePoint = Math.abs(this.P1.x + this.P2.x) * 0.5 //det the middlepoint between P1 and P2, used in detPath();
         switch (this.type) {
           case 'I':
             this.xEnd = this.P2.x - 1/2 * RECT_WIDTH - 1.5;
@@ -322,13 +331,17 @@ class Link {
             this.y = this.P1.y;
             break;
           case 'C':
-            this.xEnd = this.P2.x;
+            xOffsetMult = (this.P2.linksInC.indexOf(this) + 1) / (this.P2.linksInC.length + 1);
+            posXOffset = - 0.4 * RECT_WIDTH + (2 * xOffsetMult * 0.4 * RECT_WIDTH)
+            this.xEnd = this.P2.x + posXOffset;
             this.yEnd = this.P2.y - 1/2 * RECT_HEIGHT - 1.5;			
             this.x = this.P1.x + 1/2 * RECT_WIDTH;
             this.y = this.P1.y;
             break;					
           case 'M':
-            this.xEnd = this.P2.x;
+            xOffsetMult = (this.P2.linksInM.indexOf(this) + 1) / (this.P2.linksInM.length + 1);
+            posXOffset = - 0.4 * RECT_WIDTH + (2 * xOffsetMult * 0.4 * RECT_WIDTH)
+            this.xEnd = this.P2.x + posXOffset;
             this.yEnd = this.P2.y + 1/2 * RECT_HEIGHT + 1.5;			
             this.x = this.P1.x + 1/2 * RECT_WIDTH;
             this.y = this.P1.y;
@@ -343,13 +356,10 @@ class Link {
   }
   detPath() { //BUG: If you drag a link out of P1 without determining P2, yOffsetOutMult acts weird.
     //path attributes and variables
-    var xOffsetMult = 0;
     var yOffsetOutMult = 0;
     var yOffsetIMult = 0;
     var yOffsetI = 0;
-    var posXOffset = 0;
     var posYOffset = 0;
-    var middleOffsetCM = 0;
     var middleOffsetX = 0;
     var reversedLinksOut = [];
     if (this === MODEL.activeLink) { //if this is the actively draggable link, change opacity etc
@@ -360,20 +370,13 @@ class Link {
         this.pathAttr['opacity'] = 1;	
         this.pathAttr['stroke-dasharray'] = undefined;
         yOffsetOutMult = (this.P1.linksOut.indexOf(this) + 1) / (this.P1.linksOut.length + 1);
-        if (this.type === "C") {
-          xOffsetMult = (this.P2.linksInC.indexOf(this) + 1) / (this.P2.linksInC.length + 1);
-        }
-        if (this.type === "M") {
-          xOffsetMult = (this.P2.linksInM.indexOf(this) + 1) / (this.P2.linksInM.length + 1);
-        }
+        
         if (this.type === "I") {
           yOffsetIMult = (this.P2.linksInI.indexOf(this) + 1) / (this.P2.linksInI.length + 1);
           yOffsetI = - 0.4 * RECT_HEIGHT + (2 * yOffsetIMult * 0.4 * RECT_HEIGHT)
         }
-        posXOffset = - 0.4 * RECT_WIDTH + (2 * xOffsetMult * 0.4 * RECT_WIDTH)
         posYOffset = - 0.4 * RECT_HEIGHT + (2 * yOffsetOutMult * 0.4 * RECT_HEIGHT)
-        middleOffsetCM = - 0.5 * RECT_WIDTH - 1.5; //0.5 * this.xEnd + this.x has an offset for C and M inputs due to xEnd being on the middle of the process.
-  
+
         reversedLinksOut = this.P1.linksOut.slice().reverse();
           
           if (this.P2.linksInYUp.includes(this)) {
@@ -402,16 +405,16 @@ class Link {
             if (this.P1.y > this.P2.y - 1/2 * RECT_HEIGHT) {
               this.path = [
                 "M", this.x, this.y + posYOffset, 
-                "L", 0.5*(this.xEnd+this.x + middleOffsetCM + middleOffsetX), this.y + posYOffset, 
-                "L", 0.5*(this.xEnd+this.x + middleOffsetCM + middleOffsetX), this.yEnd - 0.5 * RECT_HEIGHT, 
-                "L", this.xEnd + posXOffset, this.yEnd - 0.5 * RECT_HEIGHT,
-                "L", this.xEnd + posXOffset, this.yEnd
+                "L", this.middlePoint + middleOffsetX, this.y + posYOffset, 
+                "L", this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 
+                "L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
+                "L", this.xEnd, this.yEnd
               ];
             } else {
               this.path = [
                 "M", this.x, this.y + posYOffset, 
-                "L", this.xEnd + posXOffset, this.y + posYOffset, 
-                "L", this.xEnd + posXOffset, this.yEnd
+                "L", this.xEnd, this.y + posYOffset, 
+                "L", this.xEnd, this.yEnd
               ]
             }
           break;
@@ -419,16 +422,16 @@ class Link {
           if (this.P1.y < this.P2.y + 1/2 * RECT_HEIGHT) {
             this.path = [
               "M", this.x, this.y + posYOffset, 
-              "L", 0.5*(this.xEnd+this.x + middleOffsetCM + middleOffsetX), this.y + posYOffset, 
-              "L", 0.5*(this.xEnd+this.x + middleOffsetCM + middleOffsetX), this.yEnd + 0.5 * RECT_HEIGHT, 
-              "L", this.xEnd + posXOffset, this.yEnd + 0.5 * RECT_HEIGHT,
-              "L", this.xEnd + posXOffset, this.yEnd
+              "L", this.middlePoint + middleOffsetX, this.y + posYOffset, 
+              "L", this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, 
+              "L", this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT,
+              "L", this.xEnd, this.yEnd
             ];
           } else {
             this.path = [
               "M", this.x, this.y + posYOffset, 
-              "L", this.xEnd + posXOffset, this.y + posYOffset, 
-              "L", this.xEnd + posXOffset, this.yEnd
+              "L", this.xEnd, this.y + posYOffset, 
+              "L", this.xEnd, this.yEnd
             ]
           }
           break;
