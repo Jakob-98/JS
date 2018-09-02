@@ -28,15 +28,14 @@ class Model {
     l.xEnd = MOUSE.pageXDown;
     l.yEnd = MOUSE.pageYDown;
     l.doDraw();
-    if (MOUSE.ON_EL) {
-      MOUSE.ON_EL.linksOut.push(l);
-    }
   }
   reDraw() { //redrawing the model, drawing each element of MODEL
+    this.linkManager();
     this.sortArrays();
+
     paper.clear();
-    for (var procces of this.processes) {
-      procces.doDraw();
+    for (var process of this.processes) {
+      process.doDraw();
     }
     for (var links of this.pLinks) {
       links.doDraw();
@@ -45,9 +44,38 @@ class Model {
   clearSelection () { //clear the selection
     this.selection = [];
   }
-  sortArrays(){ 
+  sortArrays() { 
     this.processes.sort(this.x);//sort the processes by x value
     this.pLinks.sort(this.yEnd);//sort the links by their y end value
+  }
+  linkManager() {
+    for (var process of this.processes) {
+      process.linksClear();
+    }
+    for (var link of this.pLinks) {
+      if (link !== this.activeLink){
+        if (link.P1) {
+          link.P1.linksOut.push(link);
+        }
+        if (link.P2) {
+          link.P2.linksIn.push(link);
+          switch (link.type) {
+            case "I":
+              link.P2.linksInI.push(link);
+              break;
+            case "M":
+              link.P2.linksInM.push(link);
+              break;
+            case "C":
+              link.P2.linksInC.push(link);
+              break;
+          
+            default:
+              break;
+          }
+        }
+      }
+    }
   }
 }
 //END CLASS Model
@@ -188,7 +216,15 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     MODEL.processes.pop(this);
     MODEL.redraw();
   }
-
+  linksClear() {
+    this.linksOut = [];
+    this.linksIn = [];
+    this.linksInI = [];
+    this.linksInC = [];
+    this.linksInM = [];
+    this.linksInYUp = []; 
+    this.linksInYDown = [];
+  }
   linkSorter() {
   this.linksOut.sort(function(a, b) {
       return parseInt(a.yEnd) - parseFloat(b.yEnd);
@@ -405,25 +441,6 @@ class Link {
           break;
       }
   }
-  addLinkIn() { //not LinkedIn // adds the link to the linkIn of the p2 process to be used for determining position of xEnd/yEnd
-    switch (this.type) {
-      case "I":
-        this.P2.linksInI.push(this);
-        this.P2.linksIn.push(this);
-        break;
-      case "C":
-        this.P2.linksInC.push(this);
-        this.P2.linksIn.push(this);
-        break;
-      case "M":
-        this.P2.linksInM.push(this);
-        this.P2.linksIn.push(this);
-        break;
-    
-      default:
-        break;
-    }
-  }
 }
 //END CLASS Link
 
@@ -504,20 +521,9 @@ class MouseManager {
 
       if (LINK_ELEM) {
 
-        //// So I had to use this code when I still had multiple selection of objects enabled, but now I don't need to use it at this point it time, but I dont want to remove it yet. 
-        // for (var process of MODEL.processes) { 
-        // 	process.onElement(e);
-        // 	if (this.ON_EL) {
-        // 		MODEL.selection.push(process);
-        // 		break;  //only push one item per selection click
-        // 	}
-        // }
-
-
         if (this.ON_EL) {
           MODEL.activeLink.P2 = this.ON_EL;
           MODEL.activeLink.type = this.ON_EL.selectDragArea;
-          MODEL.activeLink.addLinkIn(); //adds the linkIn for the P2 process.
           if (MODEL.activeLink.P1.linksOut.length > 5) {
             MODEL.activeLink.removeSelf();
             console.log("too many links out")
