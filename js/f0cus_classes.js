@@ -228,7 +228,14 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
       &&(startX < (this.x + 0.5 * RECT_WIDTH) && endX > (this.x - 0.5 * RECT_WIDTH))
       && (Math.abs(startY - this.y) <= 0.5 * RECT_HEIGHT) //for horizontal paths startY = endY. 
     ){
-      console.log('test');
+      return this;
+    }
+    if (
+      pathType === "vertical" 
+      &&(startY < (this.y + 0.5 * RECT_HEIGHT) && endY > (this.y - 0.5 * RECT_HEIGHT))
+      && (Math.abs(startX - this.x) <= 0.5 * RECT_WIDTH) //for horizontal paths startY = endY. 
+    ){
+      return this;
     }
 	}
   linksClear() {
@@ -431,35 +438,43 @@ class Link {
         break;
       case "C":
       if (this.P2.linksOverC) {directPath = false;}
-      if (directPath) {
+      if (!directPath) {
         pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
-
-        for (var [path, value] of Object.entries(pathDict)) {
-          for (var process of MODEL.processes) {
-            process.pathOnSelf(
-              value[0],
-              value[1],
-              value[2],
-              value[3],
-              value[4]
-            );
-            if (this.on_process) {
-              break;
-            }
-          }
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 'vertical'];
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, 'horizontal'];
+        pathDict['path2'] = [this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
+      } else {
+        pathDict['path1'] = [this.x, this.y, this.xEnd, this.y, 'horizontal'];
+        pathDict['path2'] = [this.xEnd, this.y, this.xEnd, this.yEnd, 'vertical'];
+      }       
+      for (var value of Object.values(pathDict)) {
+        for (var process of MODEL.processes) { //TODO only loop through objects between P1 and P2 for more efficient code. 
+          this.on_process = process.pathOnSelf(
+            value[0],
+            value[1],
+            value[2],
+            value[3],
+            value[4]
+          )        
         }
-      }        
-        break;
+        if (this.on_process !== null) {
+          console.log('on object')
+          //this.reRoute(); //TODO add reroute.
+          break;
+        }
+      }
+      break;
       case "M":
       if (this.P2.linksOverM) {directPath = false;}
       
-        break;
-    
+      break;
+      
       default:
-        break;
+      break;
     }
-		
+    
     //creating this.path
+    this.path = [];
 		switch (this.type) {
 			case "I":
 			this.path = [
@@ -471,19 +486,33 @@ class Link {
 			break;
 			case "C": //TODO add the yOffsetOutMult to the if statement so the link wont go "inside" the process. TODO fix the links.
 			if (this.P2.linksOverC) {
-				this.path = [
-					"M", this.x, this.y, 
-					"L", this.middlePoint + middleOffsetX, this.y, 
-                "L", this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 
-                "L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
-                "L", this.xEnd, this.yEnd
-              ];
+				    // this.path = [
+					  //     "M", this.x, this.y, 
+					  //     "L", this.middlePoint + middleOffsetX, this.y, 
+            //     "L", this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 
+            //     "L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
+            //     "L", this.xEnd, this.yEnd
+            //   ];
+            for (var [key, value] of Object.entries(pathDict)) {
+              if (key === "path1"){
+                this.path.push("M",value[0],value[1],"L",value[2],value[3])
+              } else {
+                this.path.push("L",value[0],value[1],"L",value[2],value[3])
+              }
+            }
             } else {
-              this.path = [
-                "M", this.x, this.y, 
-                "L", this.xEnd, this.y, 
-                "L", this.xEnd, this.yEnd
-              ]
+              // this.path = [
+              //   "M", this.x, this.y, 
+              //   "L", this.xEnd, this.y, 
+              //   "L", this.xEnd, this.yEnd
+              // ]
+              for (var [key, value] of Object.entries(pathDict)) {
+                if (key === "path1"){
+                  this.path.push("M",value[0],value[1],"L",value[2],value[3])
+                } else {
+                  this.path.push("L",value[0],value[1],"L",value[2],value[3])
+                }
+              }
             }
           break;
         case "M":
