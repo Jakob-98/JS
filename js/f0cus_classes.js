@@ -237,6 +237,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     ){
       return this;
     }
+    return null;
 	}
   linksClear() {
     this.linksOut = [];
@@ -399,6 +400,7 @@ class Link {
   }
   detPath() { //BUG: If you drag a link out of P1 without determining P2, yOffsetOutMult acts weird.
     //path attributes and variables
+
     var yOffsetIMult = 0;
     var yOffsetI = 0;
     var middleOffsetX = 0;
@@ -406,8 +408,13 @@ class Link {
     if (this === MODEL.activeLink) { //if this is the actively draggable link, change opacity etc
       this.pathAttr['opacity'] = 0.5;	
       this.pathAttr['stroke-dasharray'] = "--";	
+      this.path = [
+        "M", this.x, this.y, 
+        "L", this.xEnd, this.yEnd
+      ];
     } else {
       if (this.P1 && this.P2) {
+        this.path = [];
         this.pathAttr['opacity'] = 1;	
         this.pathAttr['stroke-dasharray'] = undefined;
         
@@ -434,111 +441,76 @@ class Link {
     this.on_process = null;
     switch (this.type) {
       case "I":
-        
+          // [start x, start y, end x, end y, horizontal or vertical line]
+        pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd + yOffsetI, 'vertical'];
+        pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd + yOffsetI, this.xEnd, this.yEnd + yOffsetI, 'horizontal'];
+        this.checkIfIntersect(pathDict);
         break;
       case "C":
-      if (this.P2.linksOverC) {directPath = false;}
+        if (this.P2.linksOverC) {directPath = false;}
+        if (!directPath) {
+          // [start x, start y, end x, end y, horizontal or vertical line]
+          pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
+          pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 'vertical'];
+          pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, 'horizontal'];
+          pathDict['path4'] = [this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
+        } else {
+          pathDict['path1'] = [this.x, this.y, this.xEnd, this.y, 'horizontal'];
+          pathDict['path2'] = [this.xEnd, this.y, this.xEnd, this.yEnd, 'vertical'];
+        }       
+        this.checkIfIntersect(pathDict);
+      break;
+      case "M":
+      if (this.P2.linksOverM) {directPath = false;}
       if (!directPath) {
+        // [start x, start y, end x, end y, horizontal or vertical line]
         pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
-        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 'vertical'];
-        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, 'horizontal'];
-        pathDict['path2'] = [this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, 'vertical'];
+        pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT, 'horizontal'];
+        pathDict['path4'] = [this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
       } else {
         pathDict['path1'] = [this.x, this.y, this.xEnd, this.y, 'horizontal'];
         pathDict['path2'] = [this.xEnd, this.y, this.xEnd, this.yEnd, 'vertical'];
       }       
-      for (var value of Object.values(pathDict)) {
-        for (var process of MODEL.processes) { //TODO only loop through objects between P1 and P2 for more efficient code. 
-          this.on_process = process.pathOnSelf(
-            value[0],
-            value[1],
-            value[2],
-            value[3],
-            value[4]
-          )        
-        }
-        if (this.on_process !== null) {
-          console.log('on object')
-          //this.reRoute(); //TODO add reroute.
-          break;
-        }
-      }
-      break;
-      case "M":
-      if (this.P2.linksOverM) {directPath = false;}
-      
+      this.checkIfIntersect(pathDict);
       break;
       
       default:
       break;
     }
     
-    //creating this.path
-    this.path = [];
-		switch (this.type) {
-			case "I":
-			this.path = [
-				"M", this.x, this.y, 
-				"L", (this.middlePoint + middleOffsetX), this.y, 
-				"L", (this.middlePoint + middleOffsetX), this.yEnd+ yOffsetI, 
-				"L", this.xEnd, this.yEnd + yOffsetI
-			];
-			break;
-			case "C": //TODO add the yOffsetOutMult to the if statement so the link wont go "inside" the process. TODO fix the links.
-			if (this.P2.linksOverC) {
-				    // this.path = [
-					  //     "M", this.x, this.y, 
-					  //     "L", this.middlePoint + middleOffsetX, this.y, 
-            //     "L", this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 
-            //     "L", this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT,
-            //     "L", this.xEnd, this.yEnd
-            //   ];
-            for (var [key, value] of Object.entries(pathDict)) {
-              if (key === "path1"){
-                this.path.push("M",value[0],value[1],"L",value[2],value[3])
-              } else {
-                this.path.push("L",value[0],value[1],"L",value[2],value[3])
-              }
-            }
-            } else {
-              // this.path = [
-              //   "M", this.x, this.y, 
-              //   "L", this.xEnd, this.y, 
-              //   "L", this.xEnd, this.yEnd
-              // ]
-              for (var [key, value] of Object.entries(pathDict)) {
-                if (key === "path1"){
-                  this.path.push("M",value[0],value[1],"L",value[2],value[3])
-                } else {
-                  this.path.push("L",value[0],value[1],"L",value[2],value[3])
-                }
-              }
-            }
-          break;
-        case "M":
-          if (this.P2.linksOverM) {
-            this.path = [
-              "M", this.x, this.y, 
-              "L", this.middlePoint + middleOffsetX, this.y, 
-              "L", this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, 
-              "L", this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT,
-              "L", this.xEnd, this.yEnd
-            ];
-          } else {
-            this.path = [
-              "M", this.x, this.y , 
-              "L", this.xEnd, this.y, 
-              "L", this.xEnd, this.yEnd
-            ]
-          }
-          break;
-        default:
-          this.path = [
-            "M", this.x, this.y, 
-            "L", this.xEnd, this.yEnd
-          ];
-          break;
+//creating this.path
+      for (var [key, value] of Object.entries(pathDict)) {
+      if (key === "path1"){
+        this.path.push("M",value[0],value[1],"L",value[2],value[3])
+      } else {
+        this.path.push("L",value[0],value[1],"L",value[2],value[3])
       }
+    }
+    
+	}
+  checkIfIntersect(pathDict) {
+    for (var value of Object.values(pathDict)) {
+      for (var process of MODEL.processes) { //TODO only loop through objects between P1 and P2 for more efficient code. 
+        this.on_process = process.pathOnSelf(
+          value[0],
+          value[1],
+          value[2],
+          value[3],
+          value[4]
+        )        
+      }
+      if (this.on_process !== null) {
+        console.log('on object')
+        this.reRoute(pathDict)
+        //this.reRoute(); //TODO add reroute.
+        break;
+      }
+    }
+  }
+  reRoute() {
+
   }
 }
 //END CLASS Link
