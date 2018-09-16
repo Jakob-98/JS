@@ -275,7 +275,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     return parseInt(a.x) - parseFloat(b.x);
   });
 
- }
+ }test123
 }
 //END CLASS Process
 
@@ -296,7 +296,7 @@ class Link {
   }
   doDraw() {
     this.detVals();//determine the x and y values based on where it is dragged on.
-    this.createPaths();//determine the path of the link
+    this.detPath();//determine the path of the link
     
     if (this.shape) this.shape.remove();
     this.shape = paper.set();
@@ -326,7 +326,10 @@ class Link {
     }
     MODEL.pLinks.pop(this);
   }
-  detVals () {
+	pathOnSelf() {
+		//TODO add checker if path is on self.
+	}
+  detVals() {//TODO add check if p1 = p2, change the path etc..
     var xOffsetMult = 0;
 		var posXOffset = 0;
 		var posYOffset = 0;
@@ -377,31 +380,140 @@ class Link {
 
       } 
 		}
+		if (this.P2){ //TODO this should be a switch if one or more is true, it is true for all of P2. (not functioning properly atm.)
+
+			if (this.y > this.yEnd - 0.1 * RECT_HEIGHT && this.type === "C"){
+				this.P2.linksOverC = true;
+			} else {
+				this.P2.linksOverC = false;
+			}
+			if (this.P1.y < this.P2.y + 1/2 * RECT_HEIGHT && this.type === "M"){
+				this.P2.linksOverM = true;
+			} else {
+				this.P2.linksOverM = false;
+			}
+		}
 
   }
-  createPaths () {
-    if (this.P2.linksOverC || this.P2.linksOverM) { //creates a direct path or an indirect path.
+  detPath() { //BUG: If you drag a link out of P1 without determining P2, yOffsetOutMult acts weird.
+    //path attributes and variables
+
+    var yOffsetIMult = 0;
+    var yOffsetI = 0;
+    var middleOffsetX = 0;
+    var reversedLinksOut = [];
+    if (this === MODEL.activeLink) { //if this is the actively draggable link, change opacity etc
+      this.pathAttr['opacity'] = 0.5;	
+      this.pathAttr['stroke-dasharray'] = "--";	
+      this.path = [
+        "M", this.x, this.y, 
+        "L", this.xEnd, this.yEnd
+      ];
+    } else {
+      if (this.P1 && this.P2) {
+        this.path = [];
+        this.pathAttr['opacity'] = 1;	
+        this.pathAttr['stroke-dasharray'] = undefined;
+        
+        if (this.type === "I") {
+          yOffsetIMult = (this.P2.linksInI.indexOf(this) + 1) / (this.P2.linksInI.length + 1);
+          yOffsetI = - 0.4 * RECT_HEIGHT + (2 * yOffsetIMult * 0.4 * RECT_HEIGHT)
+        }
+
+        reversedLinksOut = this.P1.linksOut.slice().reverse();
+          
+          if (this.P2.linksInYUp.includes(this)) {
+            middleOffsetX = reversedLinksOut.indexOf(this) * 0.225 * RECT_WIDTH;
+          }
+          if (this.P2.linksInYDown.includes(this)){
+            middleOffsetX = - reversedLinksOut.indexOf(this) * 0.225 * RECT_WIDTH;
+						
+        }
+      }
     }
+    
+    //determining the paths, checking if they intersect processes.
+    var directPath = true;
+    var pathDict = {};
+    this.on_process = null;
+    switch (this.type) {
+      case "I":
+          // [start x, start y, end x, end y, horizontal or vertical line]
+        pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd + yOffsetI, 'vertical'];
+        pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd + yOffsetI, this.xEnd, this.yEnd + yOffsetI, 'horizontal'];
+        this.checkIfIntersect(pathDict);
+        break;
+      case "C":
+        if (this.P2.linksOverC) {directPath = false;}
+        if (!directPath) {
+          // [start x, start y, end x, end y, horizontal or vertical line]
+          pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
+          pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, 'vertical'];
+          pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, 'horizontal'];
+          pathDict['path4'] = [this.xEnd, this.yEnd - 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
+        } else {
+          pathDict['path1'] = [this.x, this.y, this.xEnd, this.y, 'horizontal'];
+          pathDict['path2'] = [this.xEnd, this.y, this.xEnd, this.yEnd, 'vertical'];
+        }       
+        this.checkIfIntersect(pathDict);
+      break;
+      case "M":
+      if (this.P2.linksOverM) {directPath = false;}
+      if (!directPath) {
+        // [start x, start y, end x, end y, horizontal or vertical line]
+        pathDict['path1'] = [this.x, this.y, this.middlePoint + middleOffsetX, this.y, 'horizontal'];
+        pathDict['path2'] = [this.middlePoint + middleOffsetX, this.y, this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, 'vertical'];
+        pathDict['path3'] = [this.middlePoint + middleOffsetX, this.yEnd + 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT, 'horizontal'];
+        pathDict['path4'] = [this.xEnd, this.yEnd + 0.5 * RECT_HEIGHT, this.xEnd, this.yEnd, 'vertical'];
+      } else {
+        pathDict['path1'] = [this.x, this.y, this.xEnd, this.y, 'horizontal'];
+        pathDict['path2'] = [this.xEnd, this.y, this.xEnd, this.yEnd, 'vertical'];
+      }       
+      this.checkIfIntersect(pathDict);
+      break;
+      
+      default:
+      break;
+    }
+    
+//creating this.path
+      for (var [key, value] of Object.entries(pathDict)) {
+      if (key === "path1"){
+        this.path.push("M",value[0],value[1],"L",value[2],value[3])
+      } else {
+        this.path.push("L",value[0],value[1],"L",value[2],value[3])
+      }
+    }
+    
+	}
+  checkIfIntersect(pathDict) {
+    for (var value of Object.values(pathDict)) {
+      for (var process of MODEL.processes) { //TODO only loop through objects between P1 and P2 for more efficient code. 
+        this.on_process = process.pathOnSelf(
+          value[0],
+          value[1],
+          value[2],
+          value[3],
+          value[4]
+        )        
+      }
+      if (this.on_process !== null) {
+        console.log('on object')
+        this.reRoute(pathDict)
+        //this.reRoute(); //TODO add reroute.
+        break;
+      }
+    }
+  }
+  reRoute() {
 
   }
-
 }
 //END CLASS Link
 
 class Path {
-  constructor (Parent, xStart, yStart, xEnd, yEnd, pathType) {
-    this.parent = Parent;
-    this.xStart = xStart;
-    this.yStart = yStart;
-    this.xEnd = xEnd;
-    this.yEnd = yEnd;
-    this.pathType = pathType;
-    this.orientation = "";
-  }
-  drawPath() {
 
-
-  }
 }
 
 
