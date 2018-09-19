@@ -213,9 +213,9 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
   }
   removeSelf() {
     if(this.parent) {
-      this.parent.subProcesses.pop;
+      this.parent.subProcesses.splice(this.parent.subProcesses.indexOf(this));
     }
-    MODEL.processes.pop(this);
+    MODEL.processes.splice(MODEL.processes.indexOf(this));
     MODEL.redraw();
 	}
   pathOnSelf(startX, startY, endX, endY, pathType) {    //TODO add checker if path is on process
@@ -295,8 +295,9 @@ class Link {
 
   }
   doDraw() {
+    this.checkValidity(); //check if the link is valid or should be removed
     this.detVals();//determine the x and y values based on where it is dragged on.
-    this.createPaths();//determine the path of the link
+    this.detPath();//determine the path of the link
     
     if (this.shape) this.shape.remove();
     this.shape = paper.set();
@@ -305,106 +306,50 @@ class Link {
   }
   removeSelf() { //removes itself from different arrays then finally popping of the MODEL stack.
     if (this.P1) {
-      this.P1.linksOut.pop(this);
+      this.P1.linksOut.splice(this.P1.linksOut.indexOf(this));
     }
     if (this.P2) { 
-      this.P2.linksIn.pop(this);
+      this.P2.linksIn.splice(this.P2.linksIn.indexOf(this));
       switch (this.type) {
         case "I":
-        this.P2.linksInI.pop(this);
+        this.P2.linksInI.splice(this.P2.linksInI.indexOf(this));
           break;
         case "C":
-        this.P2.linksInC.pop(this);
+        this.P2.linksInC.splice(this.P2.linksInC.indexOf(this));
           break;
-        case "M":
-        this.P2.linksInM.pop(this);
+          case "M":
+          this.P2.linksInM.splice(this.P2.linksInM.indexOf(this));
           break;
       
         default:
           break;
       }
     }
-    MODEL.pLinks.pop(this);
+    MODEL.pLinks.splice(MODEL.pLinks.indexOf(this));
+  }
+  checkValidity() { 
+    if((!this.P1 || !this.P2) && this !== MODEL.activeLink) {
+      this.removeSelf();
+    }
   }
   detVals () {
-    var xOffsetMult = 0;
-		var posXOffset = 0;
-		var posYOffset = 0;
-		var yOffsetOutMult = 0;
-
-		if (this.P1) {
-			yOffsetOutMult = (this.P1.linksOut.indexOf(this) + 1) / (this.P1.linksOut.length + 1);
-			posYOffset = - 0.4 * RECT_HEIGHT + (2 * yOffsetOutMult * 0.4 * RECT_HEIGHT);
-		}
-
-		if ((!this.P1 || !this.P2) && this !== MODEL.activeLink) { //TODO add a check if there is already such a link, then either delete self or add another link with space between Y values...
-			this.removeSelf();
-		}
-
-
-    if (this.P1 === this.P2 && this !== MODEL.activeLink) { //TO DO add functionality if P1 = P2. 
-      this.removeSelf();
-    } else { 
-      if (this.P1 && this.P2) {
-        this.middlePoint = Math.abs(this.P1.x + this.P2.x) * 0.5 //det the middlepoint between P1 and P2, used in detPath();
-        switch (this.type) {
-          case 'I':
-            this.xEnd = this.P2.x - 1/2 * RECT_WIDTH - 1.5;
-            this.yEnd = this.P2.y;			
-            this.x = this.P1.x + 1/2 * RECT_WIDTH;
-            this.y = this.P1.y + posYOffset;
-            break;
-          case 'C':
-            xOffsetMult = (this.P2.linksInC.indexOf(this) + 1) / (this.P2.linksInC.length + 1);
-            posXOffset = - 0.4 * RECT_WIDTH + (2 * xOffsetMult * 0.4 * RECT_WIDTH)
-            this.xEnd = this.P2.x + posXOffset;
-            this.yEnd = this.P2.y - 1/2 * RECT_HEIGHT - 1.5;			
-            this.x = this.P1.x + 1/2 * RECT_WIDTH;
-            this.y = this.P1.y + posYOffset;
-            break;					
-          case 'M':
-            xOffsetMult = (this.P2.linksInM.indexOf(this) + 1) / (this.P2.linksInM.length + 1);
-            posXOffset = - 0.4 * RECT_WIDTH + (2 * xOffsetMult * 0.4 * RECT_WIDTH)
-            this.xEnd = this.P2.x + posXOffset;
-            this.yEnd = this.P2.y + 1/2 * RECT_HEIGHT + 1.5;			
-            this.x = this.P1.x + 1/2 * RECT_WIDTH;
-            this.y = this.P1.y + posYOffset;
-            break;
-          default:
-            this.removeSelf();
-            break;
-        }
-
-      } 
-		}
-
-  }
-  createPaths () {
-    if (this.P2.linksOverC || this.P2.linksOverM) { //creates a direct path or an indirect path.
+    if (MODEL.activeLink === this) {
+      this.pathAttr['opacity'] = 0.5;	
+      this.pathAttr['stroke-dasharray'] = "--"
+      this.path = [
+        "M", this.x, this.y, 
+        "L", this.xEnd, this.yEnd
+      ];
+    } else {
+      this.pathAttr['opacity'] = 1;	
+      this.pathAttr['stroke-dasharray'] = undefined;  
     }
+  }
+  detPath() {
 
   }
-
 }
 //END CLASS Link
-
-class Path {
-  constructor (Parent, xStart, yStart, xEnd, yEnd, pathType) {
-    this.parent = Parent;
-    this.xStart = xStart;
-    this.yStart = yStart;
-    this.xEnd = xEnd;
-    this.yEnd = yEnd;
-    this.pathType = pathType;
-    this.orientation = "";
-  }
-  drawPath() {
-
-
-  }
-}
-
-
 
 
 
