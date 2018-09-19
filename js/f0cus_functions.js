@@ -57,3 +57,51 @@ function setState(buttonId, isActive) {
 }
 
 //END BUTTON FUNCTIONS
+
+function getDragArea(dragAreaType, X, Y) {
+  var dragAreaPath = [];
+  switch (dragAreaType) { //TODO deze weghalen relatief maken en bij onload zetten. 
+    case 'C':
+    dragAreaPath = [
+        "M", X - 1/6 * RECT_WIDTH, Y - 1/6 * RECT_HEIGHT, 
+        "L", X + 1/6 * RECT_WIDTH, Y - 1/6 * RECT_HEIGHT,
+        "L", X + 1/2 * RECT_WIDTH, Y - 1/2 * RECT_HEIGHT,
+        "L", X - 1/2 * RECT_WIDTH, Y - 1/2 * RECT_HEIGHT,	
+        "L", X - 1/6 * RECT_WIDTH, Y - 1/6 * RECT_HEIGHT,
+      ]; 
+      break;			
+    case 'I':
+    dragAreaPath = [
+        "M", X - 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT, 
+        "L", X - 1/2 * RECT_WIDTH, Y + 1/2 * RECT_HEIGHT,
+        "L", X - 1/2 * RECT_WIDTH, Y - 1/2 * RECT_HEIGHT, 
+        "L", X - 1/6 * RECT_WIDTH, Y - 1/6 * RECT_HEIGHT,
+        "L", X - 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT 
+      ]; 
+      break;
+    case 'M':
+    dragAreaPath =[
+        "M", X - 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT, 
+        "L", X + 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT,
+        "L", X + 1/2 * RECT_WIDTH, Y + 1/2 * RECT_HEIGHT,
+        "L", X - 1/2 * RECT_WIDTH, Y + 1/2 * RECT_HEIGHT,	
+        "L", X - 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT,
+      ];
+      
+      break;
+    case 'O':
+    dragAreaPath = [
+        "M", X + 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT, 
+        "L", X + 1/2 * RECT_WIDTH, Y + 1/2 * RECT_HEIGHT,
+        "L", X + 1/2 * RECT_WIDTH, Y - 1/2 * RECT_HEIGHT, 
+        "L", X + 1/6 * RECT_WIDTH, Y - 1/6 * RECT_HEIGHT,
+        "L", X + 1/6 * RECT_WIDTH, Y + 1/6 * RECT_HEIGHT 
+      ];
+      break;
+  
+    default:
+    dragAreaPath = [];
+      break;
+  }
+  return dragAreaPath;
+}

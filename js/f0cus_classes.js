@@ -166,50 +166,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     if (MOUSE.ON_EL !== this || !LINK_ELEM) {
       this.selectDragArea = "";
     }
-
-    switch (this.selectDragArea) { //TODO deze weghalen relatief maken en bij onload zetten. 
-      case 'C':
-        this.dragAreaPath = [
-          "M", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT, 
-          "L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-          "L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT,
-          "L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT,	
-          "L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-        ]; 
-        break;			
-      case 'I':
-        this.dragAreaPath = [
-          "M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-          "L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
-          "L", this.x - 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
-          "L", this.x - 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-          "L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
-        ]; 
-        break;
-      case 'M':
-        this.dragAreaPath =[
-          "M", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-          "L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT,
-          "L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
-          "L", this.x - 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,	
-          "L", this.x - 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT,
-        ];
-        
-        break;
-      case 'O':
-        this.dragAreaPath = [
-          "M", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT, 
-          "L", this.x + 1/2 * RECT_WIDTH, this.y + 1/2 * RECT_HEIGHT,
-          "L", this.x + 1/2 * RECT_WIDTH, this.y - 1/2 * RECT_HEIGHT, 
-          "L", this.x + 1/6 * RECT_WIDTH, this.y - 1/6 * RECT_HEIGHT,
-          "L", this.x + 1/6 * RECT_WIDTH, this.y + 1/6 * RECT_HEIGHT 
-        ];
-        break;
-    
-      default:
-        this.dragAreaPath = "";
-        break;
-    }
+    this.dragAreaPath = getDragArea(this.selectDragArea, this.x, this.y);
   }
   removeSelf() {
     if(this.parent) {
@@ -292,12 +249,12 @@ class Link {
 		this.middlePoint = 0;
     this.on_process = null;
     this.paths = [];
+    this.pathDirection = ""; //the path direction "horizontal" or "vertical"
 
   }
   doDraw() {
     this.checkValidity(); //check if the link is valid or should be removed
-    this.detVals();//determine the x and y values based on where it is dragged on.
-    this.detPath();//determine the path of the link
+    this.createPath();
     
     if (this.shape) this.shape.remove();
     this.shape = paper.set();
@@ -332,11 +289,12 @@ class Link {
       this.removeSelf();
     }
   }
-  detVals () {
+  createPath () {
+    //path attributes
     if (MODEL.activeLink === this) {
       this.pathAttr['opacity'] = 0.5;	
       this.pathAttr['stroke-dasharray'] = "--"
-      this.path = [
+      this.path = [ //path is simple if the line is still being drawn
         "M", this.x, this.y, 
         "L", this.xEnd, this.yEnd
       ];
@@ -344,8 +302,29 @@ class Link {
       this.pathAttr['opacity'] = 1;	
       this.pathAttr['stroke-dasharray'] = undefined;  
     }
+
+    var xStart = this.x;
+    var yStart = this.y;
+    var xEnd = this.xEnd;
+    var yEnd = this.yEnd;
+
+    this.detPaths(xStart, yStart, xEnd, yEnd);
   }
-  detPath() {
+
+  detPaths(xStart, yStart, xEnd, yEnd) {
+    var blindPath = [];
+    var pathArray = [];
+    var optimalPath = [];
+
+    blindPath.push([xStart, yStart]);
+  }
+
+  checkDirection(x1, x2) {
+    if(x1 !== x2){
+      this.pathDirection = 'vertical'
+    } else {
+      this.pathDirection = 'horizontal'
+    }
 
   }
 }
