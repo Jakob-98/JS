@@ -246,9 +246,7 @@ class Link {
     }
     this.type = ""; //type is either "I" for input, "C" for control, "M" for 
     this.path = [];
-		this.middlePoint = 0;
     this.on_process = null;
-    this.paths = [];
     this.pathDirection = ""; //the path direction "horizontal" or "vertical"
 
   }
@@ -290,6 +288,14 @@ class Link {
     }
   }
   createPath () {
+
+    if (this.P1 && this.P2) {
+      this.x = this.P1.x;
+      this.y = this.P1.y;
+      this.xEnd = this.P2.x;
+      this.yEnd = this.P2.y;
+    }
+
     //path attributes
     if (MODEL.activeLink === this) {
       this.pathAttr['opacity'] = 0.5;	
@@ -303,20 +309,36 @@ class Link {
       this.pathAttr['stroke-dasharray'] = undefined;  
     }
 
+
     var xStart = this.x;
     var yStart = this.y;
     var xEnd = this.xEnd;
     var yEnd = this.yEnd;
-
-    this.detPaths(xStart, yStart, xEnd, yEnd);
+    if (this !== MODEL.activeLink){
+      this.detPaths(xStart, yStart, xEnd, yEnd);
+    }
   }
 
   detPaths(xStart, yStart, xEnd, yEnd) {
     var blindPath = [];
     var pathArray = [];
     var optimalPath = [];
+    var middlePoint1 = [];
+    var middlePoint2 = [];
 
+    middlePoint1 = [0.5 * (xStart + xEnd), yStart]
+    middlePoint2 = [0.5 * (xStart + xEnd), yEnd]
     blindPath.push([xStart, yStart]);
+    blindPath.push(middlePoint1);
+    blindPath.push(middlePoint2);
+    blindPath.push([xEnd, yEnd]);
+
+    this.path = [
+      "M",blindPath[0][0],blindPath[0][1],"L",blindPath[1][0],blindPath[1][1]
+    ]
+    for (var i = 1; i < blindPath.length; i++) {
+      this.path.push("L",blindPath[i][0],blindPath[i][1])
+    }
   }
 
   checkDirection(x1, x2) {
