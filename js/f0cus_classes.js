@@ -218,19 +218,19 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
   this.linksInYUp = [];
   this.linksInYDown = [];
 
-  for (var links of this.linksIn) {
-    if (links.yEnd > links.P1.y) {
-      this.linksInYUp.push(links);
-    } else {
-      this.linksInYDown.push(links);
-    }
-  }
-  this.linksInYUp.sort(function(a, b) {
-    return parseInt(a.x) - parseFloat(b.x);
-  });
-  this.linksInYDown.sort(function(a, b) {
-    return parseInt(a.x) - parseFloat(b.x);
-  });
+  // for (var links of this.linksIn) {
+  //   if (links.yEnd > links.P1.y) {
+  //     this.linksInYUp.push(links);
+  //   } else {
+  //     this.linksInYDown.push(links);
+  //   }
+  // }
+  // this.linksInYUp.sort(function(a, b) {
+  //   return parseInt(a.x) - parseFloat(b.x);
+  // });
+  // this.linksInYDown.sort(function(a, b) {
+  //   return parseInt(a.x) - parseFloat(b.x);
+  // });
 
  }
 }
@@ -308,30 +308,108 @@ class Link {
       this.pathAttr['opacity'] = 1;	
       this.pathAttr['stroke-dasharray'] = undefined;  
     }
-
-
+    //initialising x/y start and end value variables, and helper variables. 
     var xStart = this.x;
     var yStart = this.y;
     var xEnd = this.xEnd;
     var yEnd = this.yEnd;
+    var xProcessMargin = 1/4 * RECT_WIDTH;
+    var yProcessMargin = 1/3 * RECT_HEIGHT;
+
+    xStart += 1/2 * RECT_WIDTH + xProcessMargin; //xStart is outside of the process + margin
+
+
+    switch (this.type) { //determine the proper end values of the path
+      case "M":
+        yEnd += 1/2 * RECT_HEIGHT + yProcessMargin;
+        break;
+      case "C":
+        yEnd += -(1/2 * RECT_HEIGHT + yProcessMargin);
+        break;
+      case "I":
+        xEnd += -(1/2 * RECT_WIDTH + xProcessMargin);
+        break;
+      default:
+        break;
+    }
     if (this !== MODEL.activeLink){
       this.detPaths(xStart, yStart, xEnd, yEnd);
     }
   }
 
   detPaths(xStart, yStart, xEnd, yEnd) {
-    var blindPath = [];
+    var blindPath = []; //create a 'blind' optimal path - no checks for collision yet. 
     var pathArray = [];
     var optimalPath = [];
     var middlePoint1 = [];
     var middlePoint2 = [];
 
-    middlePoint1 = [0.5 * (xStart + xEnd), yStart]
-    middlePoint2 = [0.5 * (xStart + xEnd), yEnd]
+    if (this.P1 && this.P2) {
+    middlePoint1 = [0.5 * (this.P1.x + this.P2.x), yStart]
+    middlePoint2 = [0.5 * (this.P1.x + this.P2.x), yEnd]
+    }
+
+//DETERMINE THE BLINDPATH
     blindPath.push([xStart, yStart]);
-    blindPath.push(middlePoint1);
-    blindPath.push(middlePoint2);
-    blindPath.push([xEnd, yEnd]);
+    switch (this.type) {
+      case "M":
+      if (xStart < xEnd - 1/2 * RECT_WIDTH) {
+        if (yStart > yEnd) { 
+          blindPath.push([xEnd,yStart]);
+          blindPath.push([xEnd,yStart]);
+        } else {
+          blindPath.push([middlePoint1[0],middlePoint1[1]]);
+          blindPath.push(middlePoint2);
+        }
+      } else {
+        if (yStart > yEnd) {
+          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)])
+          blindPath.push([middlePoint1[0],Math.min(yEnd, yStart - RECT_HEIGHT)]);
+          blindPath.push([middlePoint1[0],yEnd]);
+        } else {
+          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)])
+          blindPath.push([middlePoint1[0],Math.max(yEnd, yStart + RECT_HEIGHT)]);
+          blindPath.push([middlePoint1[0],yEnd]);
+        }
+      } 
+        break;
+      case "C":
+      if (xStart < xEnd - 1/2 * RECT_WIDTH) {
+        if (yStart < yEnd) { 
+          blindPath.push([xEnd,yStart]);
+          blindPath.push([xEnd,yStart]);
+        } else {
+          blindPath.push([middlePoint1[0],middlePoint1[1]]);
+          blindPath.push(middlePoint2);
+        }
+      } else {
+        if (yStart > yEnd) {
+          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)])
+          blindPath.push([middlePoint1[0],Math.min(yEnd, yStart - RECT_HEIGHT)]);
+          blindPath.push([middlePoint1[0],yEnd]);
+        } else {
+          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)])
+          blindPath.push([middlePoint1[0],Math.max(yEnd, yStart + RECT_HEIGHT)]);
+          blindPath.push([middlePoint1[0],yEnd]);
+        }
+      } 
+        break;
+      case "I":
+      if (xStart < xEnd - 1/2 * RECT_WIDTH) {
+        blindPath.push(middlePoint1);
+        blindPath.push(middlePoint2);
+      } else {
+        blindPath.push([xStart, yEnd + RECT_HEIGHT])
+        blindPath.push([xEnd,yEnd + RECT_HEIGHT]);
+        blindPath.push([xEnd,yEnd]);
+      }
+        break;
+      default:
+        break;
+    }
+    blindPath.push([xEnd,yEnd]);
+//END DETERMINING BLINDPATH
+
 
     this.path = [
       "M",blindPath[0][0],blindPath[0][1],"L",blindPath[1][0],blindPath[1][1]
