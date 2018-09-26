@@ -175,18 +175,20 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     MODEL.processes.splice(MODEL.processes.indexOf(this));
     MODEL.redraw();
 	}
-  pathOnSelf(startX, startY, endX, endY, pathType) {    //TODO add checker if path is on process
+  pathOnSelf(startX, startY, endX, endY, pathType) { 
+    var xProcessMargin = 1/4 * RECT_WIDTH;
+    var yProcessMargin = 1/3 * RECT_HEIGHT;   
     if (
       pathType === "horizontal" 
-      &&(startX < (this.x + 0.5 * RECT_WIDTH) && endX > (this.x - 0.5 * RECT_WIDTH))
-      && (Math.abs(startY - this.y) <= 0.5 * RECT_HEIGHT) //for horizontal paths startY = endY. 
+      &&(startX < (this.x + 0.5 * RECT_WIDTH + xProcessMargin) && endX > (this.x - 0.5 * RECT_WIDTH - xProcessMargin))
+      && (Math.abs(startY - this.y) <= 0.5 * (RECT_HEIGHT + yProcessMargin)) //for horizontal paths startY = endY. 
     ){
       return this;
     }
     if (
       pathType === "vertical" 
-      &&(startY < (this.y + 0.5 * RECT_HEIGHT) && endY > (this.y - 0.5 * RECT_HEIGHT))
-      && (Math.abs(startX - this.x) <= 0.5 * RECT_WIDTH) //for horizontal paths startY = endY. 
+      &&(startY < (this.y + 0.5 * RECT_HEIGHT + yProcessMargin) && endY > (this.y - 0.5 * RECT_HEIGHT - yProcessMargin))
+      && (Math.abs(startX - this.x) <= 0.5 * (RECT_WIDTH + xProcessMargin)) //for horizontal paths startY = endY. 
     ){
       return this;
     }
@@ -247,7 +249,6 @@ class Link {
     this.type = ""; //type is either "I" for input, "C" for control, "M" for 
     this.path = [];
     this.on_process = null;
-    this.pathDirection = ""; //the path direction "horizontal" or "vertical"
 
   }
   doDraw() {
@@ -363,11 +364,11 @@ class Link {
         }
       } else {
         if (yStart > yEnd) {
-          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)])
+          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],Math.min(yEnd, yStart - RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],yEnd]);
         } else {
-          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)])
+          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],Math.max(yEnd, yStart + RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],yEnd]);
         }
@@ -384,11 +385,11 @@ class Link {
         }
       } else {
         if (yStart > yEnd) {
-          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)])
+          blindPath.push([xStart, Math.min(yEnd, yStart - RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],Math.min(yEnd, yStart - RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],yEnd]);
         } else {
-          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)])
+          blindPath.push([xStart, Math.max(yEnd, yStart + RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],Math.max(yEnd, yStart + RECT_HEIGHT)]);
           blindPath.push([middlePoint1[0],yEnd]);
         }
@@ -399,7 +400,7 @@ class Link {
         blindPath.push(middlePoint1);
         blindPath.push(middlePoint2);
       } else {
-        blindPath.push([xStart, yEnd + RECT_HEIGHT])
+        blindPath.push([xStart, yEnd + RECT_HEIGHT]);
         blindPath.push([xEnd,yEnd + RECT_HEIGHT]);
         blindPath.push([xEnd,yEnd]);
       }
@@ -409,21 +410,38 @@ class Link {
     }
     blindPath.push([xEnd,yEnd]);
 //END DETERMINING BLINDPATH
-
+    
+for (var i = 0; i < blindPath.length - 1; i++) {
+  pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
+}
+console.log(pathArray);
+for (var i = 0; i < pathArray.length; i++){
+  var direction = this.checkDirection(pathArray[i][0][0],pathArray[i][1][0]);
+  var intersectingProcess = null;
+  for (var process of MODEL.processes) {
+    intersectingProcess = process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction)
+  }
+    if(intersectingProcess) {
+      
+    } else {
+      optimalPath.push(pathArray[i])
+    }
+}
+console.log(optimalPath);
 
     this.path = [
-      "M",blindPath[0][0],blindPath[0][1],"L",blindPath[1][0],blindPath[1][1]
+      "M",optimalPath[0][0],optimalPath[0][1],"L",optimalPath[1][0],optimalPath[1][1]
     ]
-    for (var i = 1; i < blindPath.length; i++) {
-      this.path.push("L",blindPath[i][0],blindPath[i][1])
+    for (var i = 0; i < optimalPath.length; i++) {
+      this.path.push("L",optimalPath[i][0],optimalPath[i][1]);
     }
   }
 
   checkDirection(x1, x2) {
-    if(x1 !== x2){
-      this.pathDirection = 'vertical'
+    if(x1 === x2){
+     return 'vertical'
     } else {
-      this.pathDirection = 'horizontal'
+      return 'horizontal'
     }
 
   }
