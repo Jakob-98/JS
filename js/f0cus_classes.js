@@ -433,7 +433,7 @@ class Link {
       if (process.pointInProcess(pathArray[i][1][0],pathArray[i][1][1])) { pointsInProcess += 1; }
     }
       if(intersectingProcess) {
-        if (direction = "horizontal") {
+        if (direction === "horizontal") {
           if (pointsInProcess !== 2) {
             optimalPath.push([pathArray[i][0][0],pathArray[i][0][1]])
             optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathArray[i][0][1]])
@@ -442,13 +442,13 @@ class Link {
             optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , pathArray[i][0][1]])
           }
         }
-        if (direction = "vertical") {
+        if (direction === "vertical") {
           if (pointsInProcess !== 2) {
             optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]])
             optimalPath.push([pathArray[i][0][0], intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
             optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
-            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y + 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
-            optimalPath.push([pathArray[i][0][0] ,intersectingProcess.y + 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
+            optimalPath.push([pathArray[i][0][0] ,intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
           }
         }
       } else {
