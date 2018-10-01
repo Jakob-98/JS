@@ -7,7 +7,8 @@ window.onload = function() {
     MOUSE = new MouseManager();
     MODEL = new Model();
     A0 = new Process(null);
-    CONTEXT = new Process(null);
+    MODEL.CONTEXT = new Process(null);
+    
     PAPER_OFFSET =  $("#svg_paper").offset();
 
     $("#svg_paper").mousedown(function(e) {
