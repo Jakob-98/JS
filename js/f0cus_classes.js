@@ -100,7 +100,9 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     this.linksInYUp = []; //how many links have the same x coordinates on the "halfway up-point" of the line.
 		this.linksInYDown = [];
 		this.linksOverM = false;
-		this.linksOverC = false;
+    this.linksOverC = false;
+    this.xMargin = 1/4 * RECT_WIDTH;
+    this.yMargin = 1/3 * RECT_HEIGHT;
   }
   doDraw() { //draw itself
     if (MODEL.selection.includes(this)) { //changes color when selected
@@ -139,6 +141,13 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
       return;
     }
   }
+  pointInProcess (x, y) {//returns true if point is in process including margins
+    if (Math.abs(x - this.x) < 0.5 * RECT_WIDTH + this.xMargin &&
+    Math.abs(y- this.y) < 0.5 * RECT_HEIGHT + this.yMargin) {
+      return true;
+    }
+    return false;
+  }
   calcStepNr() { //calculate which step this is
     var nr = 1;
     for (var process of MODEL.processes) { //TODO sort processes and links  by x value
@@ -175,20 +184,18 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     MODEL.processes.splice(MODEL.processes.indexOf(this));
     MODEL.redraw();
 	}
-  pathOnSelf(startX, startY, endX, endY, pathType) { 
-    var xProcessMargin = 1/4 * RECT_WIDTH;
-    var yProcessMargin = 1/3 * RECT_HEIGHT;   
+  pathOnSelf(startX, startY, endX, endY, pathType) {  
     if (
       pathType === "horizontal" 
-      &&(startX < (this.x + 0.5 * RECT_WIDTH + xProcessMargin) && endX > (this.x - 0.5 * RECT_WIDTH - xProcessMargin))
-      && (Math.abs(startY - this.y) <= 0.5 * (RECT_HEIGHT + yProcessMargin)) //for horizontal paths startY = endY. 
+      &&(startX < (this.x + 0.5 * RECT_WIDTH + this.xMargin) && endX > (this.x - 0.5 * RECT_WIDTH - this.xMargin))
+      && (Math.abs(startY - this.y) <= 0.5 * (RECT_HEIGHT + this.yMargin)) //for horizontal paths startY = endY. 
     ){
       return this;
     }
     if (
       pathType === "vertical" 
-      &&(startY < (this.y + 0.5 * RECT_HEIGHT + yProcessMargin) && endY > (this.y - 0.5 * RECT_HEIGHT - yProcessMargin))
-      && (Math.abs(startX - this.x) <= 0.5 * (RECT_WIDTH + xProcessMargin)) //for horizontal paths startY = endY. 
+      &&(startY < (this.y + 0.5 * RECT_HEIGHT + this.yMargin) && endY > (this.y - 0.5 * RECT_HEIGHT - this.yMargin))
+      && (Math.abs(startX - this.x) <= 0.5 * (RECT_WIDTH + this.xMargin)) //for horizontal paths startY = endY. 
     ){
       return this;
     }
@@ -411,37 +418,59 @@ class Link {
     blindPath.push([xEnd,yEnd]);
 //END DETERMINING BLINDPATH
     
-for (var i = 0; i < blindPath.length - 1; i++) {
-  pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
-}
-console.log(pathArray);
-for (var i = 0; i < pathArray.length; i++){
-  var direction = this.checkDirection(pathArray[i][0][0],pathArray[i][1][0]);
-  var intersectingProcess = null;
-  for (var process of MODEL.processes) {
-    intersectingProcess = process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction)
+  for (var i = 0; i < blindPath.length - 1; i++) {
+    pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
   }
-    if(intersectingProcess) {
-      
-    } else {
-      optimalPath.push(pathArray[i])
+  for (var i = 0; i < pathArray.length; i++){
+    var direction = this.checkDirection(pathArray[i][0][0],pathArray[i][1][0]);
+    var intersectingProcess = null;
+    var pointsInProcess = 0;
+    for (var process of MODEL.processes) {
+      if (process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction) !== undefined) {
+        intersectingProcess = process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction);
+      }
+      if (process.pointInProcess(pathArray[i][0][0],pathArray[i][0][1])) { pointsInProcess += 1; }
+      if (process.pointInProcess(pathArray[i][1][0],pathArray[i][1][1])) { pointsInProcess += 1; }
     }
-}
-console.log(optimalPath);
+      if(intersectingProcess) {
+        if (direction = "horizontal") {
+          if (pointsInProcess !== 2) {
+            optimalPath.push([pathArray[i][0][0],pathArray[i][0][1]])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathArray[i][0][1]])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , pathArray[i][0][1]])
+          }
+        }
+        if (direction = "vertical") {
+          if (pointsInProcess !== 2) {
+            optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]])
+            optimalPath.push([pathArray[i][0][0], intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y + 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([pathArray[i][0][0] ,intersectingProcess.y + 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+          }
+        }
+      } else {
+        optimalPath.push(pathArray[i][0])
+      }
+    }
+    optimalPath.push([xEnd, yEnd])
+    console.log(optimalPath);
 
-    this.path = [
-      "M",optimalPath[0][0],optimalPath[0][1],"L",optimalPath[1][0],optimalPath[1][1]
-    ]
-    for (var i = 0; i < optimalPath.length; i++) {
-      this.path.push("L",optimalPath[i][0],optimalPath[i][1]);
+      this.path = [
+        "M",optimalPath[0][0],optimalPath[0][1],"L",optimalPath[1][0],optimalPath[1][1]
+      ]
+      for (var i = 1; i < optimalPath.length; i++) {
+        this.path.push("L",optimalPath[i][0],optimalPath[i][1]);
+      }
     }
-  }
 
   checkDirection(x1, x2) {
     if(x1 === x2){
-     return 'vertical'
+     return 'vertical';
     } else {
-      return 'horizontal'
+      return 'horizontal';
     }
 
   }
