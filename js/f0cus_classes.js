@@ -187,15 +187,23 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
   pathOnSelf(startX, startY, endX, endY, pathType) {  
     if (
       pathType === "horizontal" 
-      &&(startX < (this.x + 0.5 * RECT_WIDTH + this.xMargin) && endX > (this.x - 0.5 * RECT_WIDTH - this.xMargin))
       && (Math.abs(startY - this.y) <= 0.5 * (RECT_HEIGHT + this.yMargin)) //for horizontal paths startY = endY. 
+      &&(
+        (startX < (this.x + 0.5 * RECT_WIDTH + this.xMargin) && endX > (this.x - 0.5 * RECT_WIDTH - this.xMargin))
+      ||
+        (startX > (this.x + 0.5 * RECT_WIDTH + this.xMargin) && endX < (this.x - 0.5 * RECT_WIDTH - this.xMargin))       
+      )
     ){
       return this;
     }
     if (
       pathType === "vertical" 
-      &&(startY < (this.y + 0.5 * RECT_HEIGHT + this.yMargin) && endY > (this.y - 0.5 * RECT_HEIGHT - this.yMargin))
       && (Math.abs(startX - this.x) <= 0.5 * (RECT_WIDTH + this.xMargin)) //for horizontal paths startY = endY. 
+      &&(
+        (startY < (this.y + 0.5 * RECT_HEIGHT + this.yMargin) && endY > (this.y - 0.5 * RECT_HEIGHT - this.yMargin))
+      || 
+        (startY > (this.y + 0.5 * RECT_HEIGHT + this.yMargin) && endY < (this.y - 0.5 * RECT_HEIGHT - this.yMargin))
+        )
     ){
       return this;
     }
@@ -348,7 +356,7 @@ class Link {
   detPaths(xStart, yStart, xEnd, yEnd) {
     var blindPath = []; //create a 'blind' optimal path - no checks for collision yet. 
     var pathArray = [];
-    var optimalPath = [];
+    let optimalPath = [];
     var middlePoint1 = [];
     var middlePoint2 = [];
 
@@ -419,51 +427,56 @@ class Link {
 //END DETERMINING BLINDPATH
     
   for (var i = 0; i < blindPath.length - 1; i++) {
-    // if (!(blindPath[i][0] == blindPath[i+1][0] && [blindPath[i][1] == blindPath[i + 1][1]])) {
-    //   pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
-    // } 
     pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
   }
-  for (var i = 0; i < pathArray.length; i++) {
-    const direction = this.checkDirection(pathArray[i][0][0],pathArray[i][1][0]);
+  
+  console.log(pathArray)
+
+  for (const [[pathX1, pathY1], [pathX2, pathY2]] of pathArray) {
+    //console.log([pathX1, pathY1], [pathX2, pathY2]);
+    const direction = this.checkDirection(pathX1,pathX2);
     var intersectingProcess = null;
     var pointsInProcess = 0;
     for (var process of MODEL.processes) {
-      if (process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction) !== undefined) {
-        console.log('test');
-        intersectingProcess = process.pathOnSelf(pathArray[i][0][0], pathArray[i][0][1], pathArray[i][1][0], pathArray[i][1][1], direction);
+      if (process.pathOnSelf(pathX1, pathY1, pathX2, pathY2, direction) !== null) {
+        intersectingProcess = process.pathOnSelf(pathX1, pathY1, pathX2, pathY2, direction);
       }
-      if (process.pointInProcess(pathArray[i][0][0],pathArray[i][0][1])) { pointsInProcess += 1; }
-      if (process.pointInProcess(pathArray[i][1][0],pathArray[i][1][1])) { pointsInProcess += 1; }
+      if (process.pointInProcess(pathX1,pathY1)) { pointsInProcess += 1; }
+      if (process.pointInProcess(pathX2,pathY2)) { pointsInProcess += 1; }
+      //console.log(pointsInProcess);
     }
       if(intersectingProcess) {
         if (direction === "horizontal") {
           if (pointsInProcess == 0) {
-            optimalPath.push([pathArray[i][0][0],pathArray[i][0][1]])
-            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathArray[i][0][1]])
+            optimalPath.push([pathX1,pathY1])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathY1])
             optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
             optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
-            optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , pathArray[i][0][1]])
+            optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , pathY1])
           }
           if (pointsInProcess == 1) {
+            optimalPath.push([pathX1,pathY1])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathY1])
+            optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
+            optimalPath.push([pathX2 , intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
 
           }
         }
         if (direction === "vertical") {
           if (pointsInProcess == 0) {
-            optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]])
-            optimalPath.push([pathArray[i][0][0], intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
+            optimalPath.push([pathX1, pathY1])
+            optimalPath.push([pathX1, intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
             optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
             optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
-            optimalPath.push([pathArray[i][0][0] ,intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
+            optimalPath.push([pathX1 ,intersectingProcess.y + 1/2 * RECT_HEIGHT + intersectingProcess.yMargin])
           }
         }
       } else {
-        optimalPath.push(pathArray[i][0],pathArray[i][1])
+        optimalPath.push([pathX1, pathY1], [pathX2, pathY2])
       }
     }
-    optimalPath.unshift([xStart, yStart])
-    optimalPath.push([xEnd, yEnd])
+      optimalPath.push([xEnd, yEnd])
+      optimalPath.unshift([xStart, yStart])
 
       this.path = [
         "M",optimalPath[0][0],optimalPath[0][1],"L",optimalPath[1][0],optimalPath[1][1]

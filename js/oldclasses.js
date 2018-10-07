@@ -1,3 +1,68 @@
+// This thing
+if (pointsInProcess !== 2) {
+  optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]]);
+  optimalPath.push([intersectingProcess.x - (1 / 2) * RECT_WIDTH - intersectingProcess.xMargin, pathArray[i][0][1]]);
+  optimalPath.push([
+    intersectingProcess.x - (1 / 2) * RECT_WIDTH - intersectingProcess.xMargin,
+    intersectingProcess.y - (1 / 2) * RECT_HEIGHT - intersectingProcess.yMargin,
+  ]);
+  optimalPath.push([
+    intersectingProcess.x + (1 / 2) * RECT_WIDTH + intersectingProcess.xMargin,
+    intersectingProcess.y - (1 / 2) * RECT_HEIGHT - intersectingProcess.yMargin,
+  ]);
+  optimalPath.push([intersectingProcess.x + (1 / 2) * RECT_WIDTH + intersectingProcess.xMargin, pathArray[i][0][1]]);
+}
+
+// Would become this
+if (pointsInProcess !== 2) {
+  addToOptimalPath(pathArray[i], intersectingProcess);
+}
+
+// the definition is broken, but you get the idea
+const addToOptimalPath = (pathArray[i], intersecingProcess); {
+  optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]]);
+  optimalPath.push([intersectingProcess.x - (1 / 2) * RECT_WIDTH - intersectingProcess.xMargin, pathArray[i][0][1]]);
+  optimalPath.push([
+    intersectingProcess.x - (1 / 2) * RECT_WIDTH - intersectingProcess.xMargin,
+    intersectingProcess.y - (1 / 2) * RECT_HEIGHT - intersectingProcess.yMargin,
+  ]);
+  optimalPath.push([
+    intersectingProcess.x + (1 / 2) * RECT_WIDTH + intersectingProcess.xMargin,
+    intersectingProcess.y - (1 / 2) * RECT_HEIGHT - intersectingProcess.yMargin,
+  ]);
+  optimalPath.push([intersectingProcess.x + (1 / 2) * RECT_WIDTH + intersectingProcess.xMargin, pathArray[i][0][1]]);
+}
+
+
+
+for (const [[path00, path01], [path10, path11]] of pathArray) {
+  const direction = this.checkDirection(path00, path10);
+  let isProcessIntersecting = false;
+  let pointsInProcess = 0;
+  for (const process of MODEL.processes) {
+    if (!isProcessIntersecting)
+      isProcessIntersecting = process.pathOnSelf(path00, path01, path10, path11, direction);
+    pointsInProcess += Number(process.pointInProcess(path00, path01));  // Cheat code
+    pointsInProcess += Number(process.pointInProcess(path10, path11));  // Cheat code
+  }
+
+  if (isProcessIntersecting && pointsInProcess !== 2) {
+    switch (direction) {
+      case "horizontal":
+      break;
+      case "vertical":
+      break;
+      // other cases
+    }
+  } else
+    optimalPath.push([path00, path01]);
+}
+
+
+
+
+
+
 // F0CUS CLASS DEFINITIONS
 
 //CLASS Model
