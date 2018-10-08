@@ -105,3 +105,36 @@ function getDragArea(dragAreaType, X, Y) {
   }
   return dragAreaPath;
 }
+
+function cleanPathArray(array) { //removes duplicate points and points that are useless to the path
+  let cleanArray = [];
+  let storedCoords = [[1,1],[0,0]];
+  for (let i = 0; i < array.length; i++) {
+    let x1 = array[i][1][0] 
+    let x2 = array[i][0][0]
+    let x3 = storedCoords[0][0]
+    let x4 = storedCoords[1][0]
+    let y1 = array[i][1][1] //the if statements wont accept array[][] == array [][], so created local variables to fix that. 
+    let y2 = array[i][0][1]
+    let y3 = storedCoords[0][1]
+    let y4 = storedCoords[1][1]
+    if (!((x2 == x1 && y2 == y1))) {
+      cleanArray.push(array[i]);
+    }
+    if (((y1 == y2) && (y3 == y4)) || ((x1 == x2) && (x4 == x3))) {
+      cleanArray.pop();
+      cleanArray.push([storedCoords[0], array[i][1]]); 
+    } else {
+      storedCoords = array[i]
+    }
+  }
+  return cleanArray;
+}
+
+// function reverseArray (array) {
+//   let reveresedArray = [];
+//   for(let i = array.length - 1; i >= 0; i--) {
+//     reveresedArray.push(array[i]);
+//   }
+//   return reveresedArray;
+// }

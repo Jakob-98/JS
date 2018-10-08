@@ -1,3 +1,6 @@
+//array[i][0][0] == storedX && array[i][0][1] == storedY) || 
+
+
 // This thing
 if (pointsInProcess !== 2) {
   optimalPath.push([pathArray[i][0][0], pathArray[i][0][1]]);

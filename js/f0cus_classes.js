@@ -185,6 +185,7 @@ class Process { //TO DO: the this.x/y is currently in the left top corner, this 
     MODEL.redraw();
 	}
   pathOnSelf(startX, startY, endX, endY, pathType) {  
+    //console.log(startX, startY, endX, endY, pathType)
     if (
       pathType === "horizontal" 
       && (Math.abs(startY - this.y) <= 0.5 * (RECT_HEIGHT + this.yMargin)) //for horizontal paths startY = endY. 
@@ -430,16 +431,19 @@ class Link {
     pathArray.push([[blindPath[i][0],blindPath[i][1]],[blindPath[i + 1][0],blindPath[i + 1][1]]]);
   }
   
-  console.log(pathArray)
+ // console.log('test')
+  pathArray = cleanPathArray(pathArray);
 
+ 
   for (const [[pathX1, pathY1], [pathX2, pathY2]] of pathArray) {
     //console.log([pathX1, pathY1], [pathX2, pathY2]);
-    const direction = this.checkDirection(pathX1,pathX2);
+    let direction = this.checkDirection(pathX1,pathX2);
     var intersectingProcess = null;
     var pointsInProcess = 0;
     for (var process of MODEL.processes) {
       if (process.pathOnSelf(pathX1, pathY1, pathX2, pathY2, direction) !== null) {
         intersectingProcess = process.pathOnSelf(pathX1, pathY1, pathX2, pathY2, direction);
+        //console.log('test');
       }
       if (process.pointInProcess(pathX1,pathY1)) { pointsInProcess += 1; }
       if (process.pointInProcess(pathX2,pathY2)) { pointsInProcess += 1; }
@@ -448,6 +452,8 @@ class Link {
       if(intersectingProcess) {
         if (direction === "horizontal") {
           if (pointsInProcess == 0) {
+            //console.log('test2')
+
             optimalPath.push([pathX1,pathY1])
             optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , pathY1])
             optimalPath.push([intersectingProcess.x - 1/2 * RECT_WIDTH - intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
@@ -464,6 +470,8 @@ class Link {
         }
         if (direction === "vertical") {
           if (pointsInProcess == 0) {
+           // console.log('test3')
+
             optimalPath.push([pathX1, pathY1])
             optimalPath.push([pathX1, intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
             optimalPath.push([intersectingProcess.x + 1/2 * RECT_WIDTH + intersectingProcess.xMargin , intersectingProcess.y - 1/2 * RECT_HEIGHT - intersectingProcess.yMargin])
