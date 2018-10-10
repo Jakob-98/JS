@@ -138,3 +138,34 @@ function cleanPathArray(array) { //removes duplicate points and points that are 
 //   }
 //   return reveresedArray;
 // }
+
+function reRoute(pathX1, pathY1, pathX2, pathY2, direction, intProcess, pointsInProcess) {
+  let optimalRoute = [];
+  switch (pointsInProcess) {
+    case 0: 
+    if (direction === 'horizontal') {
+      if (pathY1 > intProcess.y) { //onderdoor
+
+      } else { //boven
+        if (pathX1 < pathX2 ) {
+          optimalRoute.push([pathX1,pathY1])
+          optimalRoute.push([intProcess.x - 1/2 * RECT_WIDTH - intProcess.xMargin , pathY1])
+          optimalRoute.push([intProcess.x - 1/2 * RECT_WIDTH - intProcess.xMargin , intProcess.y - 1/2 * RECT_HEIGHT - intProcess.yMargin])
+          optimalRoute.push([intProcess.x + 1/2 * RECT_WIDTH + intProcess.xMargin , intProcess.y - 1/2 * RECT_HEIGHT - intProcess.yMargin])
+          optimalRoute.push([intProcess.x + 1/2 * RECT_WIDTH + intProcess.xMargin , pathY1])
+        } else {
+          optimalRoute.push([pathX1,pathY1])
+          optimalRoute.push([intProcess.x + 1/2 * RECT_WIDTH + intProcess.xMargin , pathY1])
+          optimalRoute.push([intProcess.x + 1/2 * RECT_WIDTH + intProcess.xMargin , intProcess.y - 1/2 * RECT_HEIGHT - intProcess.yMargin])
+          optimalRoute.push([intProcess.x - 1/2 * RECT_WIDTH - intProcess.xMargin , intProcess.y - 1/2 * RECT_HEIGHT - intProcess.yMargin])
+          optimalRoute.push([intProcess.x - 1/2 * RECT_WIDTH - intProcess.xMargin , pathY1])
+        }
+      }
+    }
+      break;
+  
+    default:
+      break;
+  }
+  return optimalRoute;
+}
